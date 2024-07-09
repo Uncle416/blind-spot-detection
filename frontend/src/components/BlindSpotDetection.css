@@ -1,0 +1,122 @@
+/* BlindSpotDetection.css */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #101015;
+    color: #F1F0E1;
+    font-family: 'Proto Mono', monospace;
+  }
+  
+  .result-control {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .status-item {
+    background-color: #506385;
+    padding: 20px;
+    border-radius: 10px;
+    flex: 1;
+    margin: 10px;
+    text-align: center;
+  }
+  
+  .status-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .status-value {
+    font-size: 2em;
+  }
+  
+  .camera-feed {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  img {
+    max-width: 80%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 10px;
+  }
+  
+  .lock-controls {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .lock-controls button {
+    background-color: #506385;
+    color: #F1F0E1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  
+  .lock-controls button:hover {
+    background-color: #405075;
+  }
+  
+  .input-section {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+    background-color: #506385;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  button[type="submit"] {
+    background-color: #405075;
+    color: #F1F0E1;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #304065;
+  }
+  
+  .response {
+    margin-top: 20px;
+    background-color: #506385;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+  }
+  

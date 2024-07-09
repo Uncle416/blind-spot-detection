@@ -1,33 +1,17 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, Response, request, jsonify
 from flask_cors import CORS
 import cv2
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
+# Global variables to store the current values
 current_data = {
     'ultra_sonic_distance': None,
     'camera_feed': None,
     'accident_probability': None,
     'system_status': None
 }
-
-# 视频流生成器
-def generate_camera_feed():
-    camera = cv2.VideoCapture(0)  # 使用第一个摄像头
-    if not camera.isOpened():
-        print("Error: Could not open video device.")
-        return
-    while True:
-        success, frame = camera.read()
-        if not success:
-            print("Error: Could not read frame.")
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/api/ultra_sonic_distance', methods=['POST'])
 def update_distance():
@@ -37,7 +21,28 @@ def update_distance():
 
 @app.route('/api/camera_feed')
 def camera_feed():
-    return Response(generate_camera_feed(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    def generate():
+        while True:
+            cap = cv2.VideoCapture(0)  # Open the default camera
+            if not cap.isOpened():
+                print("Error: Could not open video device.")
+                continue
+
+            while cap.isOpened():
+                ret, frame = cap.read()
+                if not ret:
+                    print("Error: Could not read frame.")
+                    break
+
+                _, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+            cap.release()
+            print("Reconnecting to the camera...")
+
+    return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/api/accident_probability', methods=['POST'])
 def update_accident_probability():
@@ -53,17 +58,11 @@ def update_system_status():
 
 @app.route('/api/lock', methods=['POST'])
 def lock_car():
-    # 执行上锁操作
     return jsonify({'message': 'Car locked'})
 
 @app.route('/api/unlock', methods=['POST'])
 def unlock_car():
-    # 执行解锁操作
     return jsonify({'message': 'Car unlocked'})
 
-@app.route('/api/current_data', methods=['GET'])
-def get_current_data():
-    return jsonify(current_data)
-
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(host='0.0.0.0', port=5001, debug=True)

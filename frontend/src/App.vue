@@ -1,25 +1,29 @@
 <template>
-  <BlindSpotDetection />
+  <div id="app">
+    <BlindSpotDetection />
+  </div>
 </template>
 
 <script>
-import BlindSpotDetection from './components/BlindSpotDetection.vue'
+import BlindSpotDetection from './components/BlindSpotDetection.vue';
 
 export default {
   name: 'App',
   components: {
     BlindSpotDetection
   }
-}
+};
 </script>
 
 <style>
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 </style>

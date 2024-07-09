@@ -7,9 +7,18 @@
         <img v-if="cameraFeedUrl" :src="cameraFeedUrl" alt="Camera Feed"/>
       </div>
       <div class="status">
-        <p><strong>Ultra Sonic Sensor Distance:</strong> {{ distance }}</p>
-        <p><strong>Accident Probability:</strong> {{ accident_probability }}</p>
-        <p><strong>System Status:</strong> {{ system_status }}</p>
+        <div class="status-item">
+          <p class="status-title">Ultra Sonic Sensor Distance</p>
+          <p class="status-value">{{ distance }} cm</p>
+        </div>
+        <div class="status-item">
+          <p class="status-title">Accident Probability</p>
+          <p class="status-value">{{ accident_probability }} %</p>
+        </div>
+        <div class="status-item">
+          <p class="status-title">System Status</p>
+          <p class="status-value">{{ system_status }}</p>
+        </div>
         <div class="lock-controls">
           <button @click="lockCar">Lock Car</button>
           <button @click="unlockCar">Unlock Car</button>
@@ -48,6 +57,7 @@
 
 <script>
 import axios from 'axios';
+import './BlindSpotDetection.css';  // 引入新的 CSS 文件
 
 export default {
   data() {
@@ -118,53 +128,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.result-control {
-  text-align: center;
-}
-.camera-feed {
-  text-align: center;
-}
-img {
-  max-width: 80%;
-  height: auto;
-  margin-top: 10px;
-}
-.status {
-  margin-top: 20px;
-}
-.lock-controls {
-  margin-top: 10px;
-}
-.input-section {
-  margin-top: 30px;
-  width: 100%;
-  max-width: 600px;
-}
-.form-group {
-  margin-bottom: 20px;
-}
-label {
-  display: block;
-  margin-top: 10px;
-}
-input {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-}
-button {
-  margin-top: 10px;
-  padding: 10px 15px;
-}
-.response {
-  margin-top: 20px;
-  text-align: center;
-}
-</style>
