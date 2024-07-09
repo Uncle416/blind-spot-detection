@@ -1,0 +1,170 @@
+<template>
+  <div class="container">
+    <div class="result-control">
+      <h1>Blind Spot Detection System</h1>
+      <div class="camera-feed">
+        <label>Camera Feed:</label>
+        <img v-if="cameraFeedUrl" :src="cameraFeedUrl" alt="Camera Feed"/>
+      </div>
+      <div class="status">
+        <p><strong>Ultra Sonic Sensor Distance:</strong> {{ distance }}</p>
+        <p><strong>Accident Probability:</strong> {{ accident_probability }}</p>
+        <p><strong>System Status:</strong> {{ system_status }}</p>
+        <div class="lock-controls">
+          <button @click="lockCar">Lock Car</button>
+          <button @click="unlockCar">Unlock Car</button>
+        </div>
+      </div>
+    </div>
+    <div class="input-section">
+      <form @submit.prevent="sendDistance">
+        <div class="form-group">
+          <label for="distance">Ultra Sonic Sensor Distance:</label>
+          <input type="number" v-model="input_distance" id="distance" />
+          <button type="submit">Submit Distance</button>
+        </div>
+      </form>
+      <form @submit.prevent="sendAccidentProbability">
+        <div class="form-group">
+          <label for="accident_probability">Accident Probability:</label>
+          <input type="number" v-model="input_accident_probability" id="accident_probability" />
+          <button type="submit">Submit Accident Probability</button>
+        </div>
+      </form>
+      <form @submit.prevent="sendSystemStatus">
+        <div class="form-group">
+          <label for="system_status">System Status:</label>
+          <input type="text" v-model="input_system_status" id="system_status" />
+          <button type="submit">Submit System Status</button>
+        </div>
+      </form>
+    </div>
+    <div v-if="response" class="response">
+      <h2>Response:</h2>
+      <pre>{{ response }}</pre>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      input_distance: '',
+      input_accident_probability: '',
+      input_system_status: '',
+      distance: '',
+      accident_probability: '',
+      system_status: '',
+      response: null,
+      cameraFeedUrl: 'http://127.0.0.1:5001/api/camera_feed'
+    };
+  },
+  methods: {
+    async sendDistance() {
+      try {
+        const res = await axios.post('http://127.0.0.1:5001/api/ultra_sonic_distance', {
+          ultra_sonic_distance: this.input_distance
+        });
+        this.response = res.data;
+        this.distance = this.input_distance;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async sendAccidentProbability() {
+      try {
+        const res = await axios.post('http://127.0.0.1:5001/api/accident_probability', {
+          accident_probability: this.input_accident_probability
+        });
+        this.response = res.data;
+        this.accident_probability = this.input_accident_probability;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async sendSystemStatus() {
+      try {
+        const res = await axios.post('http://127.0.0.1:5001/api/system_status', {
+          system_status: this.input_system_status
+        });
+        this.response = res.data;
+        this.system_status = this.input_system_status;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async lockCar() {
+      try {
+        const res = await axios.post('http://127.0.0.1:5001/api/lock');
+        this.response = res.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async unlockCar() {
+      try {
+        const res = await axios.post('http://127.0.0.1:5001/api/unlock');
+        this.response = res.data;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  },
+  mounted() {
+    this.cameraFeedUrl = 'http://127.0.0.1:5001/api/camera_feed';
+  }
+};
+</script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.result-control {
+  text-align: center;
+}
+.camera-feed {
+  text-align: center;
+}
+img {
+  max-width: 80%;
+  height: auto;
+  margin-top: 10px;
+}
+.status {
+  margin-top: 20px;
+}
+.lock-controls {
+  margin-top: 10px;
+}
+.input-section {
+  margin-top: 30px;
+  width: 100%;
+  max-width: 600px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  margin-top: 10px;
+}
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+}
+button {
+  margin-top: 10px;
+  padding: 10px 15px;
+}
+.response {
+  margin-top: 20px;
+  text-align: center;
+}
+</style>
