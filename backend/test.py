@@ -1,29 +1,32 @@
 from flask import Flask, Response
-from picamera2 import Picamera2, Preview
-import io
+from picamera2 import Picamera2
 import time
+import cv2  # OpenCV 用于编码图像
 
 app = Flask(__name__)
+app.config['DEBUG'] = True  # 启用调试模式
 
 def gen():
-    picam2 = Picamera2()
-    picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
-    picam2.start()
-    time.sleep(2)  # Allow the camera to warm up
+    try:
+        picam2 = Picamera2()
+        picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
+        picam2.start()
+        app.logger.info("Camera started successfully.")
+        time.sleep(2)  # Allow the camera to warm up
 
-    stream = io.BytesIO()
-
-    while True:
-        frame = picam2.capture_array()
-        ret, jpeg = cv2.imencode('.jpg', frame)
-        if not ret:
-            continue
-        stream.seek(0)
-        stream.write(jpeg.tobytes())
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + stream.read() + b'\r\n')
-        stream.seek(0)
-        stream.truncate()
+        while True:
+            frame = picam2.capture_array()
+            if frame is None:
+                app.logger.warning("Captured frame is None.")
+                continue
+            ret, jpeg = cv2.imencode('.jpg', frame)
+            if not ret:
+                app.logger.warning("Failed to encode frame.")
+                continue
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
+    except Exception as e:
+        app.logger.error(f"Error occurred: {e}")
 
 @app.route('/api/video_feed')
 def video_feed():
