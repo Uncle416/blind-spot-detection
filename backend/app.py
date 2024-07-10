@@ -9,7 +9,7 @@ CORS(app)
 current_data = {
     'ultra_sonic_distance': None,
     'camera_feed': None,
-    'accident_probability': None,
+    'obstacle_speed': None,
     'system_status': None
 }
 
@@ -62,10 +62,10 @@ def video_feed():
     """Video streaming route. Put this in the src attribute of an img tag."""
     return Response(gen(),mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/api/accident_probability', methods=['POST'])
-def update_accident_probability():
+@app.route('/api/obstacle_speed', methods=['POST'])
+def update_obstacle_speed():
     data = request.json
-    current_data['accident_probability'] = data.get('accident_probability')
+    current_data['obstacle_speed'] = data.get('obstacle_speed')
     return jsonify({'message': 'Accident probability updated', 'current_data': current_data})
 
 @app.route('/api/system_status', methods=['POST'])

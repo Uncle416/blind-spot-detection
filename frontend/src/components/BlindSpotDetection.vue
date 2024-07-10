@@ -12,8 +12,8 @@
           <p class="status-value">{{ distance }} cm</p>
         </div>
         <div class="status-item">
-          <p class="status-title">Accident Probability</p>
-          <p class="status-value">{{ accident_probability }} %</p>
+          <p class="status-title">Obstacle Speed</p>
+          <p class="status-value">{{ obstacle_speed }} km/h</p>
         </div>
         <div class="status-item">
           <p class="status-title">System Status</p>
@@ -35,9 +35,9 @@
       </form>
       <form @submit.prevent="sendAccidentProbability">
         <div class="form-group">
-          <label for="accident_probability">Accident Probability:</label>
-          <input type="number" v-model="input_accident_probability" id="accident_probability" />
-          <button type="submit">Submit Accident Probability</button>
+          <label for="obstacle_speed">Obstacle Speed:</label>
+          <input type="number" v-model="input_obstacle_speed" id="obstacle_speed" />
+          <button type="submit">Submit Obstacle Speed</button>
         </div>
       </form>
       <form @submit.prevent="sendSystemStatus">
@@ -68,10 +68,10 @@ export default {
   data() {
     return {
       input_distance: '',
-      input_accident_probability: '',
+      input_obstacle_speed: '',
       input_system_status: '',
       distance: '',
-      accident_probability: '',
+      obstacle_speed: '',
       system_status: '',
       response: null,
       cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed'
@@ -91,11 +91,11 @@ export default {
     },
     async sendAccidentProbability() {
       try {
-        const res = await axios.post('http://127.0.0.1:5001/api/accident_probability', {
-          accident_probability: this.input_accident_probability
+        const res = await axios.post('http://127.0.0.1:5001/api/obstacle_speed', {
+          obstacle_speed: this.input_obstacle_speed
         });
         this.response = res.data;
-        this.accident_probability = this.input_accident_probability;
+        this.obstacle_speed = this.input_obstacle_speed;
       } catch (error) {
         console.error(error);
       }
