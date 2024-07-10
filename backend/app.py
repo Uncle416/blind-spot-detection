@@ -1,5 +1,5 @@
-from flask import Flask, Response, request, jsonify
-from flask_cors import CORS
+from flask import Flask, Response, request, jsonify # type: ignore
+from flask_cors import CORS # type: ignore
 import cv2
 
 app = Flask(__name__)
