@@ -62,6 +62,7 @@ body {
 .lock-controls {
     margin-top: 20px;
     text-align: center;
+
 }
   
 .lock-controls button {
@@ -73,10 +74,12 @@ body {
     margin: 5px;
     cursor: pointer;
     font-size: 1em;
+    font-family: 'Proto Mono', monospace;
 }
   
 .lock-controls button:hover {
     background-color: #405075;
+    font-family: 'Proto Mono', monospace;
 }
   
 .input-section {
@@ -115,10 +118,12 @@ button[type="submit"] {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1em;
+    font-family: 'Proto Mono', monospace;
 }
   
 button[type="submit"]:hover {
     background-color: #304065;
+    font-family: 'Proto Mono', monospace;
 }
   
 .response {

@@ -74,7 +74,7 @@ export default {
       accident_probability: '',
       system_status: '',
       response: null,
-      cameraFeedUrl: 'http://127.0.0.1:5001/api/camera_feed'
+      cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed'
     };
   },
   methods: {
@@ -129,7 +129,7 @@ export default {
     }
   },
   mounted() {
-    this.cameraFeedUrl = 'http://127.0.0.1:5001/api/camera_feed';
+    this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
   }
 };
 </script>
