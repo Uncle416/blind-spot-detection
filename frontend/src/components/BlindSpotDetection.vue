@@ -3,12 +3,12 @@
     <div class="result-control">
       <h1>Blind Spot Detection System</h1>
       <div class="camera-feed">
-        <label>Camera Feed:</label>
+        <label>Camera Feed</label>
         <img v-if="cameraFeedUrl" :src="cameraFeedUrl" alt="Camera Feed"/>
       </div>
-      <div class="status">
+      <div class="status-row">
         <div class="status-item">
-          <p class="status-title">Ultra Sonic Sensor Distance</p>
+          <p class="status-title">Obstacle Distance</p>
           <p class="status-value">{{ distance }} cm</p>
         </div>
         <div class="status-item">
@@ -19,10 +19,10 @@
           <p class="status-title">System Status</p>
           <p class="status-value">{{ system_status }}</p>
         </div>
-        <div class="lock-controls">
-          <button @click="lockCar">Lock Car</button>
-          <button @click="unlockCar">Unlock Car</button>
-        </div>
+      </div>
+      <div class="lock-controls">
+        <button @click="lockCar">Lock Car</button>
+        <button @click="unlockCar">Unlock Car</button>
       </div>
     </div>
     <div class="input-section">
@@ -43,7 +43,12 @@
       <form @submit.prevent="sendSystemStatus">
         <div class="form-group">
           <label for="system_status">System Status:</label>
-          <input type="text" v-model="input_system_status" id="system_status" />
+          <select v-model="input_system_status" id="system_status">
+            <option value="Stage 0">Stage 0</option>
+            <option value="Stage 1">Stage 1</option>
+            <option value="Stage 2">Stage 2</option>
+            <option value="Stage 3">Stage 3</option>
+          </select>
           <button type="submit">Submit System Status</button>
         </div>
       </form>
