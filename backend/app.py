@@ -46,7 +46,7 @@ def update_distance():
 
 def gen():
     """Video streaming generator function."""
-    vs = cv2.VideoCapture(0)
+    vs = cv2.VideoCapture(-1, cv2.CAP_V4L)
     while True:
         ret,frame=vs.read()
         ret, jpeg = cv2.imencode('.jpg', frame)
