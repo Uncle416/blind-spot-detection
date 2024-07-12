@@ -1,12 +1,8 @@
 <template>
   <div class="container">
+    <h1>Blind Spot Detection System</h1>
     <div class="result-control">
-      <h1>Blind Spot Detection System</h1>
-      <div class="camera-feed">
-        <label>Camera Feed</label>
-        <img v-if="cameraFeedUrl" :src="cameraFeedUrl" alt="Camera Feed"/>
-      </div>
-      <div class="status-row">
+      <div class="status-column">
         <div class="status-item">
           <p class="status-title">Obstacle Distance</p>
           <p class="status-value">{{ distance }} cm</p>
@@ -20,9 +16,15 @@
           <p class="status-value">{{ system_status }}</p>
         </div>
       </div>
-      <div class="lock-controls">
-        <button @click="lockCar">Lock Car</button>
-        <button @click="unlockCar">Unlock Car</button>
+      <div class="camera-feed-section">
+        <div class="camera-feed">
+          <label>Camera Feed</label>
+          <img v-if="cameraFeedUrl" :src="cameraFeedUrl" alt="Camera Feed"/>
+        </div>
+        <div class="lock-controls">
+          <button @click="lockCar">Lock Car</button>
+          <button @click="unlockCar">Unlock Car</button>
+        </div>
       </div>
     </div>
     <div class="input-section">

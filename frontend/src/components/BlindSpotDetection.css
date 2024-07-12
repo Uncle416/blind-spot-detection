@@ -1,6 +1,11 @@
-/* BlindSpotDetection.css */
 body {
     font-family: 'Proto Mono', monospace;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .container {
@@ -10,61 +15,72 @@ body {
     padding: 20px;
     background-color: #101015;
     color: #F1F0E1;
-    font-family: 'Proto Mono', monospace;
 }
-  
+
+h1 {
+    width: 100%;
+    text-align: center;
+}
+
 .result-control {
+    display: flex;
+    justify-content: space-between;
     width: 100%;
     max-width: 1200px;
+    flex: 1; /* Ensure it grows to take available space */
+}
+
+.status-column {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    width: 38%; /* Remaining width after camera feed */
 }
-  
-.status-row {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-  
+
 .status-item {
     background-color: #506385;
     padding: 20px;
     border-radius: 10px;
-    flex: 1;
     margin: 10px;
     text-align: center;
-    max-width: 300px;
+    flex: 1;
 }
-  
+
 .status-title {
     font-size: 1.2em;
     margin-bottom: 10px;
 }
-  
+
 .status-value {
     font-size: 2em;
 }
-  
-.camera-feed {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 20px;
+
+.camera-feed-section {
+    display: flex;
+    flex-direction: column;
+    width: 62%; /* Camera feed occupies 62% of the width */
+    text-align: left;
+    margin: 10px;
 }
 
-.camera-feed img {
-    max-width: 70%;
+.camera-feed label {
+    display: block;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+img {
+    width: 100%;
     height: auto;
     margin-top: 10px;
     border-radius: 10px;
 }
-  
-.lock-controls {
-    margin-top: 20px;
-    text-align: center;
 
+.lock-controls {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
 }
-  
+
 .lock-controls button {
     background-color: #506385;
     color: #F1F0E1;
@@ -74,33 +90,31 @@ body {
     margin: 5px;
     cursor: pointer;
     font-size: 1em;
-    font-family: 'Proto Mono', monospace;
 }
-  
+
 .lock-controls button:hover {
     background-color: #405075;
-    font-family: 'Proto Mono', monospace;
 }
-  
+
 .input-section {
     width: 100%;
     max-width: 600px;
     margin-top: 30px;
 }
-  
+
 .form-group {
     margin-bottom: 20px;
     background-color: #506385;
     padding: 20px;
     border-radius: 10px;
 }
-  
+
 label {
     display: block;
     margin-bottom: 10px;
     font-size: 1.2em;
 }
-  
+
 input, select {
     width: 100%;
     padding: 10px;
@@ -109,7 +123,7 @@ input, select {
     border: none;
     border-radius: 5px;
 }
-  
+
 button[type="submit"] {
     background-color: #405075;
     color: #F1F0E1;
@@ -118,14 +132,12 @@ button[type="submit"] {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1em;
-    font-family: 'Proto Mono', monospace;
 }
-  
+
 button[type="submit"]:hover {
     background-color: #304065;
-    font-family: 'Proto Mono', monospace;
 }
-  
+
 .response {
     margin-top: 20px;
     background-color: #506385;
