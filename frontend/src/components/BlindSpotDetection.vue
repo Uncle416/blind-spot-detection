@@ -13,7 +13,7 @@
         </div>
         <div class="status-item">
           <p class="status-title">System Status</p>
-          <p class="status-value">{{ system_status }}</p>
+          <p class="status-value">Stage{{ system_status }}</p>
         </div>
       </div>
       <div class="camera-feed-section">
@@ -22,8 +22,12 @@
           <img v-if="cameraFeedUrl" :src="cameraFeedUrl" alt="Camera Feed"/>
         </div>
         <div class="lock-controls">
-          <button @click="lockCar">Lock Car</button>
-          <button @click="unlockCar">Unlock Car</button>
+          <p>Lock / Unlock</p>
+          <label class="toggle-container">
+            <input checked="checked" type="checkbox" @click="toggleLock">
+            <svg viewBox="0 0 576 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="lock-open"><path d="M352 144c0-44.2 35.8-80 80-80s80 35.8 80 80v48c0 17.7 14.3 32 32 32s32-14.3 32-32V144C576 64.5 511.5 0 432 0S288 64.5 288 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H352V144z"></path></svg>
+            <svg viewBox="0 0 448 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="lock"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"></path></svg>
+          </label>
         </div>
       </div>
     </div>
@@ -46,10 +50,10 @@
         <div class="form-group">
           <label for="system_status">System Status:</label>
           <select v-model="input_system_status" id="system_status">
-            <option value="Stage 0">Stage 0</option>
-            <option value="Stage 1">Stage 1</option>
-            <option value="Stage 2">Stage 2</option>
-            <option value="Stage 3">Stage 3</option>
+            <option value=" 0">Stage 0</option>
+            <option value=" 1">Stage 1</option>
+            <option value=" 2">Stage 2</option>
+            <option value=" 3">Stage 3</option>
           </select>
           <button type="submit">Submit System Status</button>
         </div>
@@ -127,6 +131,13 @@ export default {
         this.response = res.data;
       } catch (error) {
         console.error(error);
+      }
+    },
+    toggleLock(event) {
+      if (event.target.checked) {
+        this.unlockCar();
+      } else {
+        this.lockCar();
       }
     }
   },
