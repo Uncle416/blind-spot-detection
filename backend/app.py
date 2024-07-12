@@ -1,6 +1,6 @@
 from flask import Flask, Response, request, jsonify # type: ignore
 from flask_cors import CORS # type: ignore
-# from picamera2 import Picamera2 # type: ignore
+from picamera2 import Picamera2 # type: ignore
 import time
 import cv2
 
