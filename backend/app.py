@@ -15,8 +15,8 @@ CORS(app)
 lock = multiprocessing.Lock()
 
 # Initial system state
-car_locked = True
-door_status = 'closed'
+car_locked = 1
+door_status = 0
 
 # Global variables to store the current values
 current_data = {
@@ -193,7 +193,7 @@ def update_system_status():
 @app.route('/api/lock', methods=['POST', 'GET'])
 def lock_car():
     global car_locked, door_status
-    if not car_locked and door_status == 'closed':
+    if not car_locked and door_status == 0:
         car_locked = True
         current_data['door_status'] = {'lock_status': car_locked, 'door_status': door_status}
         return jsonify({'message': 'Car locked', 'current_data': current_data})
@@ -212,19 +212,19 @@ def open_door():
     if car_locked:
         return jsonify({'message': 'Car door cannot be opened as the car is locked'}), 403
     if current_data['system_status'] == 2:
-        car_locked = True
-        door_status = 'closed'
+        car_locked = 1
+        door_status = 0
         current_data['door_status'] = {'lock_status': car_locked, 'door_status': door_status}
         return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'current_data': current_data}), 403
-    door_status = 'open'
+    door_status = 1
     current_data['door_status'] = {'lock_status': car_locked, 'door_status': door_status}
     return jsonify({'message': 'Car door opened', 'current_data': current_data})
 
 @app.route('/api/close', methods=['POST', 'GET'])
 def close_door():
     global car_locked, door_status
-    if door_status == 'open':
-        door_status = 'closed'
+    if door_status == 1:
+        door_status = 0
         current_data['door_status'] = {'lock_status': car_locked, 'door_status': door_status}
         return jsonify({'message': 'Car door closed', 'current_data': current_data})
     return jsonify({'message': 'Door is already closed', 'current_data': current_data})

@@ -1,4 +1,4 @@
 {
-    "lock_status": true,
-    "door_status": "closed"
+    "lock_status": 1,
+    "door_status": 0
 }
