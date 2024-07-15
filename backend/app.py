@@ -47,7 +47,7 @@ def read_distance_json():
                     calculate_system_status()
         except Exception as e:
             print(f"Error reading distance JSON file: {e}")
-        time.sleep(5)  # Adjust the interval as needed
+        time.sleep(0.005)  # Adjust the interval as needed
 
 # Function to read and write door status from JSON file periodically
 def read_write_door_json():
@@ -70,7 +70,7 @@ def read_write_door_json():
                     json.dump(current_data['door_status'], f)
         except Exception as e:
             print(f"Error writing door JSON file: {e}")
-        time.sleep(5)  # Adjust the interval as needed
+        time.sleep(0.005)  # Adjust the interval as needed
 
 # Function to write system_status to JSON file periodically
 def write_status_json():
@@ -82,7 +82,7 @@ def write_status_json():
                     json.dump({'system_status': current_data['system_status']}, f)
         except Exception as e:
             print(f"Error writing status JSON file: {e}")
-        time.sleep(5)  # Adjust the interval as needed
+        time.sleep(0.005)  # Adjust the interval as needed
 
 # Function to calculate system status
 def calculate_system_status():

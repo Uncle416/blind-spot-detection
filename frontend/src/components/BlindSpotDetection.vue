@@ -100,8 +100,8 @@ export default {
       obstacle_type: '',
       system_status: '',
       door_status: {
-        lock_status: true,
-        door_status: 'closed'
+        lock_status: 1,
+        door_status: 0
       },
       response: null,
       cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed'
@@ -212,7 +212,7 @@ export default {
   },
   mounted() {
     this.fetchData();
-    setInterval(this.fetchData, 5000);
+    setInterval(this.fetchData, 5);
   }
 };
 </script>
