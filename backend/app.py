@@ -90,25 +90,25 @@ def calculate_system_status():
     obstacle_type = current_data.get('obstacle_type')
 
     if distance is None or obstacle_type is None:
-        current_data['system_status'] = 'safe'
+        current_data['system_status'] = 0
         return
 
     if obstacle_type.lower() == 'pedestrian':
         if 0 <= distance < 10:
-            current_data['system_status'] = 'urgent'
+            current_data['system_status'] = 2
         elif 10 <= distance < 30:
-            current_data['system_status'] = 'dangerous'
+            current_data['system_status'] = 1
         else:
-            current_data['system_status'] = 'safe'
+            current_data['system_status'] = 0
     elif obstacle_type.lower() == 'car':
         if 0 <= distance < 20:
-            current_data['system_status'] = 'urgent'
+            current_data['system_status'] = 2
         elif 20 <= distance < 50:
-            current_data['system_status'] = 'dangerous'
+            current_data['system_status'] = 1
         else:
-            current_data['system_status'] = 'safe'
+            current_data['system_status'] = 0
     else:
-        current_data['system_status'] = None
+        current_data['system_status'] = 0
 
 # YOLOv5 Initialization
 model = YOLOv5("/home/pi/DL-PART/DLP/yolov5s.pt")  # 选择模型
@@ -211,7 +211,7 @@ def open_door():
     global car_locked, door_status
     if car_locked:
         return jsonify({'message': 'Car door cannot be opened as the car is locked'}), 403
-    if current_data['system_status'] == 'urgent':
+    if current_data['system_status'] == 2:
         car_locked = True
         door_status = 'closed'
         current_data['door_status'] = {'lock_status': car_locked, 'door_status': door_status}
