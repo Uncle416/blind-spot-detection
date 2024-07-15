@@ -41,9 +41,13 @@ h1 {
     border-radius: 10px;
     margin: 10px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex: 1;
     flex-direction: column;
 }
+
 
 .status-title {
     font-size: 1.2em;
@@ -74,88 +78,83 @@ img {
     border-radius: 10px;
 }
 
-.lock-controls {
+.control-modules {
+    display: flex;
+    justify-content: space-between;
+}
+
+.lock-controls, .door-controls {
     display: flex;
     justify-content: center;
     flex-direction: column;
     background-color: #F1F0E1;
     padding: 20px;
+    margin: 10px;
     border-radius: 10px;
     margin-top: 10px;
     text-align: center;
-    width: 33.3%;
+    width: 48%;
     position: relative;
+    align-items: stretch;
 }
 
-.lock-controls p {
-    margin-bottom: 10px;
+.lock-controls p, .door-controls p {
+    margin-bottom: 20px;
     color: #506385;
 }
 
 .toggle-container {
-    --color: #a5a5b0;
-    --size: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
     cursor: pointer;
-    font-size: var(--size);
     user-select: none;
-    fill: var(--color);
-    margin-top: 20px;
-    flex-direction: column; /* 添加这个使图标和文字垂直对齐 */
+    background-color: white;
+    padding: 10px 15px 10px 10px;
+    border-radius: 10px;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    color: #506385;
+    font-size: 1em;
 }
 
-.toggle-container p {
-    margin-bottom: 10px; /* 确保文字和图标之间有合适的间距 */
+.toggle-container .action {
+    position: relative;
+    overflow: hidden;
+    display: grid;
 }
 
-.toggle-container svg {
-    margin-top: 10px; /* 调整图标的位置 */
+.toggle-container .action span {
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    transition: all .5s;
 }
 
-.toggle-container .lock-open {
-    position: absolute;
-    animation: keyframes-fill .5s;
+.toggle-container .action span.option-1 {
+    transform: translate(0px, 0%);
+    opacity: 1;
 }
 
-.toggle-container .lock {
-    position: absolute;
-    display: none;
-    animation: keyframes-fill .5s;
-}
-
-/* ------ On check event ------ */
-.toggle-container input:checked ~ .lock-open {
-    display: none;
-}
-
-.toggle-container input:checked ~ .lock {
-    display: block;
-}
-
-/* ------ Hide the default checkbox ------ */
-.toggle-container input {
-    position: absolute;
+input:checked + .toggle-container .action span.option-1 {
+    transform: translate(0px, -100%);
     opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
 }
 
-/* ------ Animation ------ */
-@keyframes keyframes-fill {
-    0% {
-        transform: scale(0);
-        opacity: 0;
-    }
-
-    50% {
-        transform: scale(1.2);
-    }
+.toggle-container .action span.option-2 {
+    transform: translate(0px, 100%);
+    opacity: 0;
 }
 
+input:checked + .toggle-container .action span.option-2 {
+    transform: translate(0px, 0%);
+    opacity: 1;
+}
+
+/* Hide the default checkbox */
+#lock, #door {
+    display: none;
+}
 
 .input-section {
     width: 100%;

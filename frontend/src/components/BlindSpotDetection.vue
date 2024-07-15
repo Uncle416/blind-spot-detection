@@ -8,8 +8,8 @@
           <p class="status-value">{{ distance }} cm</p>
         </div>
         <div class="status-item">
-          <p class="status-title">Obstacle Speed</p>
-          <p class="status-value">{{ obstacle_speed }} km/h</p>
+          <p class="status-title">Obstacle Type</p>
+          <p class="status-value">{{ obstacle_type }}</p>
         </div>
         <div class="status-item">
           <p class="status-title">System Status</p>
@@ -21,13 +21,27 @@
           <label>Camera Feed</label>
           <img v-if="cameraFeedUrl" :src="cameraFeedUrl" alt="Camera Feed"/>
         </div>
-        <div class="lock-controls">
-          <p>Lock / Unlock</p>
-          <label class="toggle-container">
-            <input checked="checked" type="checkbox" @click="toggleLock">
-            <svg viewBox="0 0 576 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="lock-open"><path d="M352 144c0-44.2 35.8-80 80-80s80 35.8 80 80v48c0 17.7 14.3 32 32 32s32-14.3 32-32V144C576 64.5 511.5 0 432 0S288 64.5 288 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H352V144z"></path></svg>
-            <svg viewBox="0 0 448 512" height="1em" xmlns="http://www.w3.org/2000/svg" class="lock"><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"></path></svg>
-          </label>
+        <div class="control-modules">
+          <div class="lock-controls">
+            <p>Lock / Unlock</p>
+            <input type="checkbox" checked="checked" id="lock" @click="toggleLock">
+            <label for="lock" class="toggle-container">
+              <div class="action">
+                <span class="option-1">Locked</span>
+                <span class="option-2">Unlocked</span>
+              </div>
+            </label>
+          </div>
+          <div class="door-controls">
+            <p>Open / Close</p>
+            <input type="checkbox" checked="checked" id="door" @click="toggleDoor">
+            <label for="door" class="toggle-container">
+              <div class="action">
+                <span class="option-1">Opened</span>
+                <span class="option-2">Closed</span>
+              </div>
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -41,9 +55,12 @@
       </form>
       <form @submit.prevent="sendAccidentProbability">
         <div class="form-group">
-          <label for="obstacle_speed">Obstacle Speed:</label>
-          <input type="number" v-model="input_obstacle_speed" id="obstacle_speed" />
-          <button type="submit">Submit Obstacle Speed</button>
+          <label for="obstacle_type">Obstacle Type:</label>
+          <select v-model="input_obstacle_type" id="obstacle_type">
+            <option value="Car">Car</option>
+            <option value="Pedestrian">Pedestrian</option>
+          </select>
+          <button type="submit">Submit Obstacle Type</button>
         </div>
       </form>
       <form @submit.prevent="sendSystemStatus">
@@ -74,16 +91,30 @@ export default {
   data() {
     return {
       input_distance: '',
-      input_obstacle_speed: '',
+      input_obstacle_type: '',
       input_system_status: '',
       distance: '',
-      obstacle_speed: '',
+      obstacle_type: '',
       system_status: '',
       response: null,
-      cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed'
+      cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed',
+      isLocked: true, // 初始化为锁定状态
+      isDoorOpen: false // 初始化为关闭状态
     };
   },
   methods: {
+    async fetchData() {
+      try {
+        const res = await axios.get('http://127.0.0.1:5001/api/current_data');
+        const data = res.data;
+        this.distance = data.ultra_sonic_distance;
+        this.obstacle_type = data.obstacle_type;
+        this.system_status = data.system_status;
+        this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async sendDistance() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/ultra_sonic_distance', {
@@ -97,11 +128,11 @@ export default {
     },
     async sendAccidentProbability() {
       try {
-        const res = await axios.post('http://127.0.0.1:5001/api/obstacle_speed', {
-          obstacle_speed: this.input_obstacle_speed
+        const res = await axios.post('http://127.0.0.1:5001/api/obstacle_type', {
+          obstacle_type: this.input_obstacle_type
         });
         this.response = res.data;
-        this.obstacle_speed = this.input_obstacle_speed;
+        this.obstacle_type = this.input_obstacle_type;
       } catch (error) {
         console.error(error);
       }
@@ -121,6 +152,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/lock');
         this.response = res.data;
+        this.isLocked = true; // 更新前端锁定状态
       } catch (error) {
         console.error(error);
       }
@@ -129,6 +161,26 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/unlock');
         this.response = res.data;
+        this.isLocked = false; // 更新前端锁定状态
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async openDoor() {
+      try {
+        const res = await axios.post('http://127.0.0.1:5001/api/open');
+        this.response = res.data;
+        this.isDoorOpen = true; // 更新前端开门状态
+      } catch (error) {
+        console.error(error);
+        this.isDoorOpen = false; // 如果请求失败，保持关门状态
+      }
+    },
+    async closeDoor() {
+      try {
+        const res = await axios.post('http://127.0.0.1:5001/api/close');
+        this.response = res.data;
+        this.isDoorOpen = false; // 更新前端关门状态
       } catch (error) {
         console.error(error);
       }
@@ -139,10 +191,24 @@ export default {
       } else {
         this.lockCar();
       }
+    },
+    toggleDoor(event) {
+      if (this.isLocked) {
+        // 如果车辆是锁定状态，阻止切换
+        event.preventDefault();
+        return;
+      }
+      if (event.target.checked) {
+        this.closeDoor();
+      } else {
+        this.openDoor();
+      }
     }
   },
   mounted() {
-    this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
+    // this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
+    this.fetchData();
+    setInterval(this.fetchData, 5000);
   }
 };
 </script>
