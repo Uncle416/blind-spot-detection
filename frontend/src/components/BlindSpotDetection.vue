@@ -13,7 +13,11 @@
         </div>
         <div class="status-item">
           <p class="status-title">System Status</p>
-          <p class="status-value">Stage{{ system_status }}</p>
+          <p class="status-value">{{ system_status }}</p>
+        </div>
+        <div class="status-item">
+          <p class="status-title">Door Status</p>
+          <p class="status-value">{{ door_status.door_status }}</p>
         </div>
       </div>
       <div class="camera-feed-section">
@@ -24,7 +28,7 @@
         <div class="control-modules">
           <div class="lock-controls">
             <p>Lock / Unlock</p>
-            <input type="checkbox" checked="checked" id="lock" @click="toggleLock">
+            <input type="checkbox" :checked="door_status.lock_status" id="lock" @click="toggleLock">
             <label for="lock" class="toggle-container">
               <div class="action">
                 <span class="option-1">Locked</span>
@@ -34,7 +38,7 @@
           </div>
           <div class="door-controls">
             <p>Open / Close</p>
-            <input type="checkbox" checked="checked" id="door" @click="toggleDoor">
+            <input type="checkbox" :checked="door_status.door_status === 'open'" id="door" @click="toggleDoor">
             <label for="door" class="toggle-container">
               <div class="action">
                 <span class="option-1">Opened</span>
@@ -53,12 +57,12 @@
           <button type="submit">Submit Distance</button>
         </div>
       </form>
-      <form @submit.prevent="sendAccidentProbability">
+      <form @submit.prevent="sendObstacleType">
         <div class="form-group">
           <label for="obstacle_type">Obstacle Type:</label>
           <select v-model="input_obstacle_type" id="obstacle_type">
-            <option value="Car">Car</option>
-            <option value="Pedestrian">Pedestrian</option>
+            <option value="car">Car</option>
+            <option value="pedestrian">Pedestrian</option>
           </select>
           <button type="submit">Submit Obstacle Type</button>
         </div>
@@ -67,10 +71,9 @@
         <div class="form-group">
           <label for="system_status">System Status:</label>
           <select v-model="input_system_status" id="system_status">
-            <option value=" 0">Stage 0</option>
-            <option value=" 1">Stage 1</option>
-            <option value=" 2">Stage 2</option>
-            <option value=" 3">Stage 3</option>
+            <option value="safe">Safe</option>
+            <option value="dangerous">Dangerous</option>
+            <option value="urgent">Urgent</option>
           </select>
           <button type="submit">Submit System Status</button>
         </div>
@@ -96,10 +99,12 @@ export default {
       distance: '',
       obstacle_type: '',
       system_status: '',
+      door_status: {
+        lock_status: true,
+        door_status: 'closed'
+      },
       response: null,
-      cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed',
-      isLocked: true, // 初始化为锁定状态
-      isDoorOpen: false // 初始化为关闭状态
+      cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed'
     };
   },
   methods: {
@@ -110,6 +115,7 @@ export default {
         this.distance = data.ultra_sonic_distance;
         this.obstacle_type = data.obstacle_type;
         this.system_status = data.system_status;
+        this.door_status = data.door_status;
         this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
       } catch (error) {
         console.error(error);
@@ -126,7 +132,7 @@ export default {
         console.error(error);
       }
     },
-    async sendAccidentProbability() {
+    async sendObstacleType() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/obstacle_type', {
           obstacle_type: this.input_obstacle_type
@@ -152,7 +158,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/lock');
         this.response = res.data;
-        this.isLocked = true; // 更新前端锁定状态
+        this.door_status.lock_status = true;
       } catch (error) {
         console.error(error);
       }
@@ -161,7 +167,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/unlock');
         this.response = res.data;
-        this.isLocked = false; // 更新前端锁定状态
+        this.door_status.lock_status = false;
       } catch (error) {
         console.error(error);
       }
@@ -170,17 +176,16 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/open');
         this.response = res.data;
-        this.isDoorOpen = true; // 更新前端开门状态
+        this.door_status.door_status = 'open';
       } catch (error) {
         console.error(error);
-        this.isDoorOpen = false; // 如果请求失败，保持关门状态
       }
     },
     async closeDoor() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/close');
         this.response = res.data;
-        this.isDoorOpen = false; // 更新前端关门状态
+        this.door_status.door_status = 'closed';
       } catch (error) {
         console.error(error);
       }
@@ -193,20 +198,19 @@ export default {
       }
     },
     toggleDoor(event) {
-      if (this.isLocked) {
+      if (this.door_status.lock_status) {
         // 如果车辆是锁定状态，阻止切换
         event.preventDefault();
         return;
       }
       if (event.target.checked) {
-        this.closeDoor();
-      } else {
         this.openDoor();
+      } else {
+        this.closeDoor();
       }
     }
   },
   mounted() {
-    // this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
     this.fetchData();
     setInterval(this.fetchData, 5000);
   }
