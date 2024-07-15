@@ -1,11 +1,12 @@
 from flask import Flask, Response, request, jsonify # type: ignore
 from flask_cors import CORS # type: ignore
-from picamera2 import Picamera2 # type: ignore
+from picamera2 import Picamera2, Preview # type: ignore
 import time
 import cv2
 import json
 import os
 from threading import Thread
+from yolov5 import YOLOv5
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -52,10 +53,6 @@ def read_obstacle_json():
             print(f"Error reading obstacle JSON file: {e}")
         time.sleep(5)  # Adjust the interval as needed
 
-# Start the threads to read JSON files periodically
-Thread(target=read_distance_json).start()
-Thread(target=read_obstacle_json).start()
-
 # @app.route('/api/video_feed')
 # def camera_feed():
 #     def generate():
@@ -81,19 +78,30 @@ Thread(target=read_obstacle_json).start()
 
 #     return Response(generate(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+# YOLOv5 and Picamera2 Initialization
+picam2 = Picamera2()
+camera_config = picam2.create_video_configuration(main={"size": (640, 480)})
+picam2.configure(camera_config)
+picam2.start()
+
+model = YOLOv5("/home/pi/DL-PART/DLP/yolov5s.pt")  # 选择模型
+
 def gen():
     try:
-        picam2 = Picamera2()
-        picam2.configure(picam2.create_video_configuration(main={"size": (640, 480)}))
-        picam2.start()
-        app.logger.info("Camera started successfully.")
-        time.sleep(2)  # Allow the camera to warm up
-
         while True:
             frame = picam2.capture_array()
             if frame is None:
                 app.logger.warning("Captured frame is None.")
                 continue
+
+            # Perform object detection
+            results = model.predict(frame)
+            for *xyxy, conf, cls in results.xyxy[0]:
+                label = f'{model.model.names[int(cls)]} {conf:.2f}'
+                print(f"检测到物体: {label}")
+                cv2.rectangle(frame, (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (0, 0, 255), 2)
+                cv2.putText(frame, label, (int(xyxy[0]), int(xyxy[1]) - 10), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
+
             ret, jpeg = cv2.imencode('.jpg', frame)
             if not ret:
                 app.logger.warning("Failed to encode frame.")
@@ -153,4 +161,8 @@ def get_current_data():
     return jsonify(current_data)
 
 if __name__ == '__main__':
+    # Start the threads to read JSON files periodically
+    Thread(target=read_distance_json).start()
+    Thread(target=read_obstacle_json).start()
+
     app.run(host='0.0.0.0', port=5001, debug=True)
