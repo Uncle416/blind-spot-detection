@@ -6,7 +6,7 @@ import cv2
 import json
 import os
 from threading import Thread
-from yolov5 import YOLOv5
+from yolov5 import YOLOv5 # type: ignore
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
