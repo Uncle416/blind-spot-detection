@@ -41,20 +41,28 @@ def read_distance_json():
                     data = json.load(f)
                     ultra_sonic_distance = data.get('ultra_sonic_distance')
                     calculate_system_status()
+        except json.JSONDecodeError:
+            print(f"Error reading distance JSON file: Invalid JSON")
         except Exception as e:
             print(f"Error reading distance JSON file: {e}")
-        time.sleep(0.005)  # Adjust the interval as needed
+        time.sleep(0.5)  # Adjust the interval as needed
 
 # Function to read and write door status from JSON file periodically
 def read_write_door_json():
     global car_locked, door_status
     while True:
         try:
-            with lock:    
+            with lock:
                 with open(door_file_path, 'r') as f:
-                    data = json.load(f)
-                    car_locked = data.get('lock_status')
-                    door_status = data.get('door_status')
+                    data = f.read().strip()
+                    if data:
+                        data = json.loads(data)
+                        car_locked = data.get('lock_status')
+                        door_status = data.get('door_status')
+                    else:
+                        print("Door JSON file is empty")
+        except json.JSONDecodeError:
+            print(f"Error reading door JSON file: Invalid JSON")
         except Exception as e:
             print(f"Error reading door JSON file: {e}")
         
@@ -65,7 +73,7 @@ def read_write_door_json():
                     json.dump({'lock_status': car_locked, 'door_status': door_status}, f)
         except Exception as e:
             print(f"Error writing door JSON file: {e}")
-        time.sleep(0.005)  # Adjust the interval as needed
+        time.sleep(0.5)  # Adjust the interval as needed
 
 # Function to write system_status to JSON file periodically
 def write_status_json():
@@ -77,7 +85,7 @@ def write_status_json():
                     json.dump({'system_status': system_status}, f)
         except Exception as e:
             print(f"Error writing status JSON file: {e}")
-        time.sleep(0.005)  # Adjust the interval as needed
+        time.sleep(0.5)  # Adjust the interval as needed
 
 # Function to calculate system status
 def calculate_system_status():
@@ -106,6 +114,35 @@ def calculate_system_status():
 # YOLOv5 Initialization
 model = YOLOv5("/home/pi/DL-PART/DLP/yolov5s.pt")  # 选择模型
 
+# Function to handle YOLO model prediction
+def yolo_prediction(picam2):
+    global obstacle_type
+    while True:
+        frame = picam2.capture_array()
+        if frame is None:
+            app.logger.warning("Captured frame is None.")
+            continue
+        
+        # Perform object detection
+        results = model.predict(frame)
+        detected_objects = []
+        for *xyxy, conf, cls in results.xyxy[0]:
+            label = f'{model.model.names[int(cls)]} {conf:.2f}'
+            print(f"检测到物体: {label}")
+            if label.lower() == 'person':
+                detected_objects.append('pedestrian')
+            else:
+                detected_objects.append('car')
+
+        # Update the global obstacle_type with the detected objects
+        if detected_objects:
+            obstacle_type = detected_objects[0]  # Use the first detected object
+        else:
+            obstacle_type = "None"
+
+        calculate_system_status()
+        time.sleep(1)  # Adjust the interval as needed
+
 def initialize_camera():
     retries = 5
     for i in range(retries):
@@ -120,8 +157,8 @@ def initialize_camera():
             time.sleep(2)  # Wait before retrying
     raise RuntimeError("Failed to initialize camera after multiple attempts")
 
-def gen(picam2):
-    global obstacle_type
+# Function to generate video feed for the web interface
+def video_feed_generator(picam2):
     try:
         while True:
             frame = picam2.capture_array()
@@ -135,23 +172,6 @@ def gen(picam2):
                 continue
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + jpeg.tobytes() + b'\r\n\r\n')
-            
-            # Perform object detection
-            results = model.predict(frame)
-            detected_objects = []
-            for *xyxy, conf, cls in results.xyxy[0]:
-                label = f'{model.model.names[int(cls)]} {conf:.2f}'
-                print(f"检测到物体: {label}")
-                detected_objects.append(model.model.names[int(cls)])
-
-            # Update the global obstacle_type with the detected objects
-            if detected_objects:
-                obstacle_type = detected_objects[0]  # Use the first detected object
-            else:
-                obstacle_type = "None"
-
-            calculate_system_status()
-
     except Exception as e:
         app.logger.error(f"Error occurred: {e}")
     finally:
@@ -161,7 +181,8 @@ def gen(picam2):
 @app.route('/api/video_feed')
 def video_feed():
     picam2 = initialize_camera()
-    return Response(gen(picam2),
+    Thread(target=yolo_prediction, args=(picam2,)).start()
+    return Response(video_feed_generator(picam2),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/api/ultra_sonic_distance', methods=['POST'])
@@ -239,4 +260,4 @@ if __name__ == '__main__':
     Thread(target=read_write_door_json).start()
     Thread(target=write_status_json).start()
 
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True, threaded=True)
