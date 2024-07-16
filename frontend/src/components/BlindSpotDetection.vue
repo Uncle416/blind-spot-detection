@@ -71,9 +71,9 @@
         <div class="form-group">
           <label for="system_status">System Status:</label>
           <select v-model="input_system_status" id="system_status">
-            <option value=0>Safe</option>
-            <option value=1>Dangerous</option>
-            <option value=2>Urgent</option>
+            <option value=1>Safe</option>
+            <option value=2>Dangerous</option>
+            <option value=3>Urgent</option>
           </select>
           <button type="submit">Submit System Status</button>
         </div>
