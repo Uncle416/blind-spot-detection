@@ -30,7 +30,7 @@ car_locked = 2  # 1: unlocked, 2: locked
 door_status = 1  # 1: closed, 2: open
 
 # Control variable for serial communication
-serial_comm_control = 0
+serial_comm_control = 1 # 0: write, 1: read
 
 # Define the base directory
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -57,10 +57,11 @@ def read_write_door_json():
     while True:
         if serial_comm_control == 1 and ser2.in_waiting > 0:
             line = ser2.readline().decode('utf-8').strip()
-            system_status = int(line[0])
-            door_status = int(line[1])
-            car_locked = int(line[2])
-            serial_comm_control = 0
+            if line:
+                system_status = int(line[0])
+                door_status = int(line[1])
+                car_locked = int(line[2])
+                serial_comm_control = 0
         time.sleep(0.5)  # Adjust the interval as needed
 
 # Function to write system_status to JSON file periodically

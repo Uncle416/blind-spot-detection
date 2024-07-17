@@ -24,7 +24,7 @@
         <div class="control-modules">
           <div class="lock-controls">
             <p>Lock / Unlock</p>
-            <input type="checkbox" v-model="lock_status" @change="toggleLock">
+            <input type="checkbox" :checked="lock_status === 2" id="lock" v-model="lock_status" @change="toggleLock">
             <label for="lock" class="toggle-container">
               <div class="action">
                 <span class="option-1">Unlocked</span>
@@ -34,7 +34,7 @@
           </div>
           <div class="door-controls">
             <p>Open / Close</p>
-            <input type="checkbox" v-model="door_status" @change="toggleDoor">
+            <input type="checkbox" :checked="door_status === 2" id="door" v-model="door_status" @change="toggleDoor">
             <label for="door" class="toggle-container">
               <div class="action">
                 <span class="option-1">Closed</span>
@@ -109,8 +109,8 @@ export default {
         this.distance = data.ultra_sonic_distance;
         this.obstacle_type = data.obstacle_type;
         this.system_status = data.system_status;
-        this.lock_status = data.lock_status;
-        this.door_status = data.door_status;
+        this.lock_status = data.door_status.lock_status;
+        this.door_status = data.door_status.door_status;
         this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
       } catch (error) {
         console.error(error);
@@ -197,20 +197,19 @@ export default {
         console.error(error);
       }
     },
-    toggleLock(event) {
-      if (event.target.checked) {
-        this.unlockCar();
-      } else {
+    toggleLock() {
+      if (this.lock_status === 1) {
         this.lockCar();
+      } else {
+        this.unlockCar();
       }
     },
-    toggleDoor(event) {
+    toggleDoor() {
       if (this.lock_status === 2) {
         // 如果车辆是锁定状态，阻止切换
-        event.preventDefault();
         return;
       }
-      if (event.target.checked) {
+      if (this.door_status === 1) {
         this.openDoor();
       } else {
         this.closeDoor();
