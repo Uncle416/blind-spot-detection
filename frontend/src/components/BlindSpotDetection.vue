@@ -24,7 +24,7 @@
         <div class="control-modules">
           <div class="lock-controls">
             <p>Lock / Unlock</p>
-            <input type="checkbox" :checked="lock_status === 1" id="lock" @change="toggleLock">
+            <input type="checkbox" v-model="lock_status" @change="toggleLock">
             <label for="lock" class="toggle-container">
               <div class="action">
                 <span class="option-1">Unlocked</span>
@@ -34,7 +34,7 @@
           </div>
           <div class="door-controls">
             <p>Open / Close</p>
-            <input type="checkbox" :checked="door_status === 2" id="door" @change="toggleDoor">
+            <input type="checkbox" v-model="door_status" @change="toggleDoor">
             <label for="door" class="toggle-container">
               <div class="action">
                 <span class="option-1">Closed</span>
