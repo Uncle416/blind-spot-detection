@@ -45,36 +45,6 @@
         </div>
       </div>
     </div>
-    <!-- <div class="input-section">
-      <form @submit.prevent="sendDistance">
-        <div class="form-group">
-          <label for="distance">Ultra Sonic Sensor Distance:</label>
-          <input type="number" v-model="input_distance" id="distance" />
-          <button type="submit">Submit Distance</button>
-        </div>
-      </form>
-      <form @submit.prevent="sendObstacleType">
-        <div class="form-group">
-          <label for="obstacle_type">Obstacle Type:</label>
-          <select v-model="input_obstacle_type" id="obstacle_type">
-            <option value="car">Car</option>
-            <option value="pedestrian">Pedestrian</option>
-          </select>
-          <button type="submit">Submit Obstacle Type</button>
-        </div>
-      </form>
-      <form @submit.prevent="sendSystemStatus">
-        <div class="form-group">
-          <label for="system_status">System Status:</label>
-          <select v-model="input_system_status" id="system_status">
-            <option value="1">Safe</option>
-            <option value="2">Warning</option>
-            <option value="3">Dangerous</option>
-          </select>
-          <button type="submit">Submit System Status</button>
-        </div>
-      </form>
-    </div> -->
     <div v-if="response" class="response">
       <h2>Response:</h2>
       <pre>{{ response }}</pre>

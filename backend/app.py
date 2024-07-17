@@ -53,8 +53,7 @@ def read_distance_json():
                     continue
                 ultra_sonic_distance = value / 100
                 ser1.reset_input_buffer()
-                time.sleep(0.5) # Adjust the interval as needed
-            else: print("Not enough data received. Waiting for more data.") 
+                time.sleep(0.5) # Adjust the interval as needed 
         except struct.error as e: 
             print(f"Error unpacking data: {e}") 
             ser1.reset_input_buffer() 
@@ -66,24 +65,15 @@ def read_distance_json():
 def read_write_door_json():
     global system_status, car_locked, door_status, serial_comm_control
     while True:
-        if serial_comm_control == 1 and ser2.in_waiting > 0:
+        if ser2.in_waiting > 0:
             line = ser2.readline().decode('utf-8').strip()
             if line:
-                system_status = int(line[0])
-                door_status = int(line[1])
-                car_locked = int(line[2])
-                serial_comm_control = 0
-        time.sleep(0.5)  # Adjust the interval as needed
-
-# Function to write system_status to JSON file periodically
-def write_status_json():
-    global system_status, serial_comm_control
-    while True:
-        if serial_comm_control == 0:
-            pdu = 100 * system_status + 10 * door_status + car_locked
-            ser2.write(str(pdu).encode('utf-8'))
-            serial_comm_control = 1
-        time.sleep(0.5)  # Adjust the interval as needed
+                if len(line)>= 3:
+                    system_status = int(line[0])
+                    door_status = int(line[1])
+                    car_locked = int(line[2])
+                    # serial_comm_control = 0
+                time.sleep(0.5)  # Adjust the interval as needed
 
 # Function to calculate system status
 def calculate_system_status():
@@ -92,7 +82,7 @@ def calculate_system_status():
         system_status = 1
         pdu = 100 * system_status + 10 * door_status + car_locked
         ser2.write(str(pdu).encode('utf-8'))
-        serial_comm_control = 1
+        # serial_comm_control = 1
         return
 
     if obstacle_type.lower() == 'pedestrian':
@@ -114,7 +104,7 @@ def calculate_system_status():
 
     pdu = 100 * system_status + 10 * door_status + car_locked
     ser2.write(str(pdu).encode('utf-8'))
-    serial_comm_control = 1
+    # serial_comm_control = 1
     return
 
 # YOLOv5 Initialization
