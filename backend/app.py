@@ -265,20 +265,20 @@ def open_door():
         update_serial_status()
         return jsonify({'message': 'Car door closed', 'lock_status': car_locked, 'door_status': door_status})
 
-    if car_locked == 2:
-        return jsonify({'message': 'Car door cannot be opened as the car is locked'})
-    if system_status == 3:
-        car_locked = 2
-        door_status = 1
+    # if car_locked == 2:
+    #     return jsonify({'message': 'Car door cannot be opened as the car is locked'})
+    # if system_status == 3:
+    #     car_locked = 2
+    #     door_status = 1
 
-        serial_comm_control = 1
-        update_serial_status()
-        return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'lock_status': car_locked, 'door_status': door_status})
-    door_status = 2
+    #     serial_comm_control = 1
+    #     update_serial_status()
+    #     return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'lock_status': car_locked, 'door_status': door_status})
+    # door_status = 2
 
-    serial_comm_control = 1
-    update_serial_status()
-    return jsonify({'message': 'Car door opened', 'lock_status': car_locked, 'door_status': door_status})
+    # serial_comm_control = 1
+    # update_serial_status()
+    # return jsonify({'message': 'Car door opened', 'lock_status': car_locked, 'door_status': door_status})
 
 # @app.route('/api/close', methods=['POST', 'GET'])
 # def close_door():
