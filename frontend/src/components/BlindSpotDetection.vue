@@ -27,8 +27,8 @@
             <input type="checkbox" :checked="lock_status === 1" id="lock" @change="toggleLock">
             <label for="lock" class="toggle-container">
               <div class="action">
-                <span class="option-1">Unlocked</span>
-                <span class="option-2">Locked</span>
+                <span class="option-1">Locked</span>
+                <span class="option-2">Unlocked</span>
               </div>
             </label>
           </div>
