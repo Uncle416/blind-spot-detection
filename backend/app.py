@@ -87,9 +87,12 @@ def write_status_json():
 
 # Function to calculate system status
 def calculate_system_status():
-    global ultra_sonic_distance, obstacle_type, system_status
+    global ultra_sonic_distance, obstacle_type, system_status, car_locked, door_status, serial_comm_control
     if ultra_sonic_distance is None or obstacle_type is None:
         system_status = 1
+        pdu = 100 * system_status + 10 * door_status + car_locked
+        ser2.write(str(pdu).encode('utf-8'))
+        serial_comm_control = 1
         return
 
     if obstacle_type.lower() == 'pedestrian':
@@ -108,6 +111,11 @@ def calculate_system_status():
             system_status = 1
     else:
         system_status = 1
+
+    pdu = 100 * system_status + 10 * door_status + car_locked
+    ser2.write(str(pdu).encode('utf-8'))
+    serial_comm_control = 1
+    return
 
 # YOLOv5 Initialization
 model = YOLOv5("/home/pi/DL-PART/DLP/yolov5s.pt")  # 选择模型
