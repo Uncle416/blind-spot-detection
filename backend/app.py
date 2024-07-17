@@ -44,15 +44,23 @@ status_file_path = os.path.join(base_dir, '..', 'data', 'status', 'system_status
 def read_distance_json():
     global ultra_sonic_distance
     while True:
-        if ser1.in_waiting >= 4:
-            data = ser1.read(4)
-            value = struct.unpack('I', data)[0]
-            if value >= 1000000:
+        try:
+            if ser1.in_waiting >= 4:
+                data = ser1.read(4)
+                value = struct.unpack('I', data)[0]
+                if value >= 1000000:
+                    ser1.reset_input_buffer()
+                    continue
+                ultra_sonic_distance = value / 100
                 ser1.reset_input_buffer()
-                continue
-            ultra_sonic_distance = value / 100
+                time.sleep(0.5) # Adjust the interval as needed
+            else: print("Not enough data received. Waiting for more data.") 
+        except struct.error as e: 
+            print(f"Error unpacking data: {e}") 
+            ser1.reset_input_buffer() 
+        except Exception as e:
+            print(f"Unexpected error: {e}") 
             ser1.reset_input_buffer()
-        time.sleep(0.5)  # Adjust the interval as needed
 
 # Function to read and write door status from JSON file periodically
 def read_write_door_json():
