@@ -205,10 +205,6 @@ export default {
       }
     },
     toggleDoor(event) {
-      if (this.lock_status === 2) {
-        event.preventDefault();
-        return;
-      }
       if (event.target.checked) {
         this.openDoor();
       } else {
