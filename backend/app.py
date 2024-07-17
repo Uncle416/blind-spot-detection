@@ -47,9 +47,10 @@ def read_distance_json():
         if ser1.in_waiting >= 4:
             data = ser1.read(4)
             value = struct.unpack('I', data)[0]
-            ultra_sonic_distance = value / 100
-            if ultra_sonic_distance >= 10000:
+            if value >= 1000000:
+                ser1.reset_input_buffer()
                 continue
+            ultra_sonic_distance = value / 100
             ser1.reset_input_buffer()
         time.sleep(0.5)  # Adjust the interval as needed
 
