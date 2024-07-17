@@ -13,11 +13,7 @@
         </div>
         <div class="status-item">
           <p class="status-title">System Status</p>
-          <p class="status-value">{{ system_status }}</p>
-        </div>
-        <div class="status-item">
-          <p class="status-title">Door Status</p>
-          <p class="status-value">{{ door_status.door_status }}</p>
+          <p class="status-value">{{ getSystemStatusText(system_status) }}</p>
         </div>
       </div>
       <div class="camera-feed-section">
@@ -72,8 +68,8 @@
           <label for="system_status">System Status:</label>
           <select v-model="input_system_status" id="system_status">
             <option value=1>Safe</option>
-            <option value=2>Dangerous</option>
-            <option value=3>Urgent</option>
+            <option value=2>Warning</option>
+            <option value=3>Dangerous</option>
           </select>
           <button type="submit">Submit System Status</button>
         </div>
@@ -119,6 +115,18 @@ export default {
         this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
       } catch (error) {
         console.error(error);
+      }
+    },
+    getSystemStatusText(status) {
+      switch(status) {
+        case 1:
+          return 'Safe';
+        case 2:
+          return 'Warning';
+        case 3:
+          return 'Dangerous';
+        default:
+          return 'Safe';
       }
     },
     async sendDistance() {

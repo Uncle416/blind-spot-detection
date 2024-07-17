@@ -39,11 +39,13 @@ status_file_path = os.path.join(base_dir, '..', 'data', 'status', 'system_status
 
 # Function to read ultra_sonic_distance from JSON file periodically
 def read_distance_json():
+    global ultra_sonic_distance
     while True:
         if ser1.in_waiting >= 4:
             data = ser1.read(4)
             value = struct.unpack('I',data)[0]
-            ultra_sonic_distance = value
+            ultra_sonic_distance = value / 100
+            ser1.reset_input_buffer()
         # global ultra_sonic_distance
         # while True:
         #     try:
@@ -151,7 +153,8 @@ def yolo_prediction(picam2):
         for *xyxy, conf, cls in results.xyxy[0]:
             label = f'{model.model.names[int(cls)]} {conf:.2f}'
             print(f"检测到物体: {label}")
-            if label.lower() == 'person':
+            class_label = label.split(' ')[0]
+            if class_label.lower() == 'person':
                 detected_objects.append('pedestrian')
             else:
                 detected_objects.append('car')
@@ -187,6 +190,9 @@ def video_feed_generator(picam2):
             if frame is None:
                 app.logger.warning("Captured frame is None.")
                 continue
+            
+            # Convert BGR to RGB
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
             ret, jpeg = cv2.imencode('.jpg', frame)
             if not ret:
