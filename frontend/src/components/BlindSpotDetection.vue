@@ -128,15 +128,15 @@ export default {
         console.error(error);
       }
     },
-    async lockCar() {
-      try {
-        const res = await axios.post('http://127.0.0.1:5001/api/lock');
-        this.response = res.data;
-        this.fetchData();
-      } catch (error) {
-        console.error(error);
-      }
-    },
+    // async lockCar() {
+    //   try {
+    //     const res = await axios.post('http://127.0.0.1:5001/api/lock');
+    //     this.response = res.data;
+    //     this.fetchData();
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // },
     async unlockCar() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/unlock');
@@ -155,28 +155,20 @@ export default {
         console.error(error);
       }
     },
-    async closeDoor() {
-      try {
-        const res = await axios.post('http://127.0.0.1:5001/api/close');
-        this.response = res.data;
-        this.fetchData();
-      } catch (error) {
-        console.error(error);
-      }
+    // async closeDoor() {
+    //   try {
+    //     const res = await axios.post('http://127.0.0.1:5001/api/close');
+    //     this.response = res.data;
+    //     this.fetchData();
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // },
+    toggleLock() {
+      this.lockCar();
     },
-    toggleLock(event) {
-      if (event.target.checked) {
-        this.unlockCar();
-      } else {
-        this.lockCar();
-      }
-    },
-    toggleDoor(event) {
-      if (event.target.checked) {
-        this.openDoor();
-      } else {
-        this.closeDoor();
-      }
+    toggleDoor() {
+      this.openDoor();
     }
   },
   mounted() {

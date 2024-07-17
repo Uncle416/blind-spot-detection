@@ -68,19 +68,22 @@ def read_write_door_serial():
     while True:
         try:
             with lock:
-                if serial_comm_control == 1 and ser2.in_waiting > 0:
+                if ser2.in_waiting > 0:
+                    print("read1")
                     line = ser2.readline().decode('utf-8').strip()
+                    print("read2")
                     if line and len(line) >= 3:
+                        print("read3")
                         system_status = int(line[0])
                         door_status = int(line[1])
                         car_locked = int(line[2])
                         print(line)
-                    serial_comm_control = 0
-                elif serial_comm_control == 0:
-                    pdu = 100 * system_status + 10 * door_status + car_locked
-                    print("read write ", pdu)
-                    ser2.write(str(pdu).encode('utf-8'))
-                    serial_comm_control = 1
+                    # serial_comm_control = 0
+                # elif serial_comm_control == 0:
+                #     pdu = 100 * system_status + 10 * door_status + car_locked
+                #     print("read write ", pdu)
+                #     ser2.write(str(pdu).encode('utf-8'))
+                #     serial_comm_control = 1
             time.sleep(1)  # Adjust the interval as needed
         except Exception as e:
             print(f"Error in read_write_door_serial: {e}")
@@ -211,54 +214,82 @@ def update_system_status():
     system_status = data.get('system_status')
     return jsonify({'message': 'System status updated', 'system_status': system_status})
 
-@app.route('/api/lock', methods=['POST', 'GET'])
-def lock_car():
-    global car_locked, door_status, serial_comm_control
-    car_locked = 2
+# @app.route('/api/lock', methods=['POST', 'GET'])
+# def lock_car():
+#     global car_locked, door_status, serial_comm_control
+#     car_locked = 2
     
-    serial_comm_control = 1
-    print('LOCK PRESSED')
-    update_serial_status()
-    return jsonify({'message': 'Car locked', 'lock_status': car_locked, 'door_status': door_status})
+#     serial_comm_control = 1
+#     print('LOCK PRESSED')
+#     update_serial_status()
+#     return jsonify({'message': 'Car locked', 'lock_status': car_locked, 'door_status': door_status})
 
-@app.route('/api/unlock', methods=['POST', 'GET'])
-def unlock_car():
-    global car_locked, serial_comm_control
-    car_locked = 1
-
-    serial_comm_control = 1
-    print('UNLOCK PRESSED')
-    update_serial_status()
-    return jsonify({'message': 'Car unlocked', 'lock_status': car_locked, 'door_status': door_status})
-
-@app.route('/api/open', methods=['POST', 'GET'])
-def open_door():
+@app.route('/api/unlock', methods=['POST'])
+def unlock_control():
     global car_locked, door_status, serial_comm_control
     if car_locked == 2:
-        return jsonify({'message': 'Car door cannot be opened as the car is locked'}), 403
+        car_locked = 1
+        serial_comm_control = 1
+        print('UNLOCK PRESSED')
+        update_serial_status()
+        return jsonify({'message': 'Car unlocked', 'lock_status': car_locked, 'door_status': door_status})
+    elif car_locked == 1:
+        car_locked = 2
+        serial_comm_control = 1
+        print('LOCK PRESSED')
+        update_serial_status()
+        return jsonify({'message': 'Car locked', 'lock_status': car_locked, 'door_status': door_status})
+
+@app.route('/api/open', methods=['POST'])
+def open_door():
+    global car_locked, door_status, serial_comm_control
+    if door_status == 1:
+        if car_locked == 2:
+            return jsonify({'message': 'Car door cannot be opened as the car is locked'})
+        elif car_locked == 1 and (system_status == 1 or 2):
+            door_status = 2
+
+            serial_comm_control = 1
+            update_serial_status()
+            return jsonify({'message': 'Car door opened', 'lock_status': car_locked, 'door_status': door_status})
+        elif car_locked == 1 and system_status == 3:
+            car_locked = 2
+
+            serial_comm_control = 1
+            update_serial_status()
+            return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'lock_status': car_locked, 'door_status': door_status})
+    else:
+        door_status = 1
+
+        serial_comm_control = 1
+        update_serial_status()
+        return jsonify({'message': 'Car door closed', 'lock_status': car_locked, 'door_status': door_status})
+
+    if car_locked == 2:
+        return jsonify({'message': 'Car door cannot be opened as the car is locked'})
     if system_status == 3:
         car_locked = 2
         door_status = 1
 
         serial_comm_control = 1
         update_serial_status()
-        return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'lock_status': car_locked, 'door_status': door_status}), 403
+        return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'lock_status': car_locked, 'door_status': door_status})
     door_status = 2
 
     serial_comm_control = 1
     update_serial_status()
     return jsonify({'message': 'Car door opened', 'lock_status': car_locked, 'door_status': door_status})
 
-@app.route('/api/close', methods=['POST', 'GET'])
-def close_door():
-    global car_locked, door_status, serial_comm_control
-    if door_status == 2:
-        door_status = 1
+# @app.route('/api/close', methods=['POST', 'GET'])
+# def close_door():
+#     global car_locked, door_status, serial_comm_control
+#     if door_status == 2:
+#         door_status = 1
  
-        serial_comm_control = 1
-        update_serial_status()
-        return jsonify({'message': 'Car door closed', 'lock_status': car_locked, 'door_status': door_status})
-    return jsonify({'message': 'Door is already closed', 'lock_status': car_locked, 'door_status': door_status})
+#         serial_comm_control = 1
+#         update_serial_status()
+#         return jsonify({'message': 'Car door closed', 'lock_status': car_locked, 'door_status': door_status})
+#     return jsonify({'message': 'Door is already closed', 'lock_status': car_locked, 'door_status': door_status})
 
 @app.route('/api/current_data', methods=['GET'])
 def get_current_data():
