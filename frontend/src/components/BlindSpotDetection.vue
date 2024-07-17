@@ -132,6 +132,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/lock');
         this.response = res.data;
+        this.fetchData();
       } catch (error) {
         console.error(error);
       }
@@ -140,6 +141,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/unlock');
         this.response = res.data;
+        this.fetchData();
       } catch (error) {
         console.error(error);
       }
@@ -148,6 +150,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/open');
         this.response = res.data;
+        this.fetchData();
       } catch (error) {
         console.error(error);
       }
@@ -156,6 +159,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/close');
         this.response = res.data;
+        this.fetchData();
       } catch (error) {
         console.error(error);
       }
