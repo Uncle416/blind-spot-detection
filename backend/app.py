@@ -24,10 +24,10 @@ ser2 = serial.Serial("/dev/ttyACM0",9600)
 ultra_sonic_distance = 0
 camera_feed = None
 obstacle_type = None
-system_status = 0
+system_status = 1
 # Initial system state
-car_locked = 1 # 1: locked, 0: unlocked
-door_status = 0 # 0: closed, 1: open
+car_locked = 2 # 1: unlocked, 2: locked
+door_status = 1 # 1: closed, 2: open
 
 # Define the base directory
 base_dir = os.path.dirname(os.path.abspath(__file__))

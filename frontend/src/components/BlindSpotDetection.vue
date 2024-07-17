@@ -24,21 +24,21 @@
         <div class="control-modules">
           <div class="lock-controls">
             <p>Lock / Unlock</p>
-            <input type="checkbox" :checked="door_status.lock_status" id="lock" @click="toggleLock">
+            <input type="checkbox" :checked="lock_status === 1" id="lock" @change="toggleLock">
             <label for="lock" class="toggle-container">
               <div class="action">
-                <span class="option-1">Locked</span>
-                <span class="option-2">Unlocked</span>
+                <span class="option-1">Unlocked</span>
+                <span class="option-2">Locked</span>
               </div>
             </label>
           </div>
           <div class="door-controls">
             <p>Open / Close</p>
-            <input type="checkbox" :checked="door_status.door_status === 'open'" id="door" @click="toggleDoor">
+            <input type="checkbox" :checked="door_status === 2" id="door" @change="toggleDoor">
             <label for="door" class="toggle-container">
               <div class="action">
-                <span class="option-1">Opened</span>
-                <span class="option-2">Closed</span>
+                <span class="option-1">Closed</span>
+                <span class="option-2">Opened</span>
               </div>
             </label>
           </div>
@@ -67,9 +67,9 @@
         <div class="form-group">
           <label for="system_status">System Status:</label>
           <select v-model="input_system_status" id="system_status">
-            <option value=1>Safe</option>
-            <option value=2>Warning</option>
-            <option value=3>Dangerous</option>
+            <option value="1">Safe</option>
+            <option value="2">Warning</option>
+            <option value="3">Dangerous</option>
           </select>
           <button type="submit">Submit System Status</button>
         </div>
@@ -95,10 +95,8 @@ export default {
       distance: '',
       obstacle_type: '',
       system_status: '',
-      door_status: {
-        lock_status: 1,
-        door_status: 0
-      },
+      lock_status: 2, // 1: unlocked, 2: locked
+      door_status: 1, // 1: closed, 2: open
       response: null,
       cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed'
     };
@@ -111,6 +109,7 @@ export default {
         this.distance = data.ultra_sonic_distance;
         this.obstacle_type = data.obstacle_type;
         this.system_status = data.system_status;
+        this.lock_status = data.lock_status;
         this.door_status = data.door_status;
         this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
       } catch (error) {
@@ -126,7 +125,7 @@ export default {
         case 3:
           return 'Dangerous';
         default:
-          return 'Safe';
+          return 'Unknown';
       }
     },
     async sendDistance() {
@@ -166,7 +165,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/lock');
         this.response = res.data;
-        this.door_status.lock_status = true;
+        this.lock_status = 2;
       } catch (error) {
         console.error(error);
       }
@@ -175,7 +174,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/unlock');
         this.response = res.data;
-        this.door_status.lock_status = false;
+        this.lock_status = 1;
       } catch (error) {
         console.error(error);
       }
@@ -184,7 +183,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/open');
         this.response = res.data;
-        this.door_status.door_status = 'open';
+        this.door_status = 2;
       } catch (error) {
         console.error(error);
       }
@@ -193,7 +192,7 @@ export default {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/close');
         this.response = res.data;
-        this.door_status.door_status = 'closed';
+        this.door_status = 1;
       } catch (error) {
         console.error(error);
       }
@@ -206,7 +205,7 @@ export default {
       }
     },
     toggleDoor(event) {
-      if (this.door_status.lock_status) {
+      if (this.lock_status === 2) {
         // 如果车辆是锁定状态，阻止切换
         event.preventDefault();
         return;
@@ -220,7 +219,7 @@ export default {
   },
   mounted() {
     this.fetchData();
-    setInterval(this.fetchData, 5);
+    setInterval(this.fetchData, 5000);
   }
 };
 </script>
