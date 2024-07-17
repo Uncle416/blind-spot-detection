@@ -63,14 +63,13 @@ def read_distance_json():
 # Function to read and write door status from JSON file periodically
 def read_write_door_json():
     #0  ABC， A：1 代表安全，2代表危险，3代表极度危险；B：1代表车门关闭，2代表车门开启；C：1代表解锁，2代表上锁
-    global car_locked, door_status
+    global system_status, car_locked, door_status
     while True:
         if ser2.in_waiting > 0:
             line = ser2.readline().decode('utf-8').strip()
-            match = re.match(r"L(\d+)D(\d+)",line)
-            if match:
-                car_locked = int(match.group(1))
-                door_status = int(match.group(2))
+            system_status = (int)(line[0])
+            door_status =(int)(line[1])
+            car_locked = (int)(line[2])
 
 
         # try:
