@@ -24,11 +24,11 @@
         <div class="control-modules">
           <div class="lock-controls">
             <p>Lock / Unlock</p>
-            <input type="checkbox" :checked="lock_status === 1" id="lock" @change="toggleLock">
+            <input type="checkbox" :checked="lock_status === 2" id="lock" @change="toggleLock">
             <label for="lock" class="toggle-container">
               <div class="action">
-                <span class="option-1">Locked</span>
-                <span class="option-2">Unlocked</span>
+                <span class="option-1">Unlocked</span>
+                <span class="option-2">Locked</span>
               </div>
             </label>
           </div>
@@ -45,7 +45,7 @@
         </div>
       </div>
     </div>
-    <div class="input-section">
+    <!-- <div class="input-section">
       <form @submit.prevent="sendDistance">
         <div class="form-group">
           <label for="distance">Ultra Sonic Sensor Distance:</label>
@@ -74,7 +74,7 @@
           <button type="submit">Submit System Status</button>
         </div>
       </form>
-    </div>
+    </div> -->
     <div v-if="response" class="response">
       <h2>Response:</h2>
       <pre>{{ response }}</pre>
@@ -133,8 +133,6 @@ export default {
         const res = await axios.post('http://127.0.0.1:5001/api/ultra_sonic_distance', {
           ultra_sonic_distance: this.input_distance
         });
-        this.response = res.data;
-        this.distance = this.input_distance;
       } catch (error) {
         console.error(error);
       }
@@ -144,8 +142,6 @@ export default {
         const res = await axios.post('http://127.0.0.1:5001/api/obstacle_type', {
           obstacle_type: this.input_obstacle_type
         });
-        this.response = res.data;
-        this.obstacle_type = this.input_obstacle_type;
       } catch (error) {
         console.error(error);
       }
@@ -155,8 +151,6 @@ export default {
         const res = await axios.post('http://127.0.0.1:5001/api/system_status', {
           system_status: this.input_system_status
         });
-        this.response = res.data;
-        this.system_status = this.input_system_status;
       } catch (error) {
         console.error(error);
       }
@@ -164,8 +158,6 @@ export default {
     async lockCar() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/lock');
-        this.response = res.data;
-        this.lock_status = 2;
       } catch (error) {
         console.error(error);
       }
@@ -173,8 +165,6 @@ export default {
     async unlockCar() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/unlock');
-        this.response = res.data;
-        this.lock_status = 1;
       } catch (error) {
         console.error(error);
       }
@@ -182,8 +172,6 @@ export default {
     async openDoor() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/open');
-        this.response = res.data;
-        this.door_status = 2;
       } catch (error) {
         console.error(error);
       }
@@ -191,8 +179,6 @@ export default {
     async closeDoor() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/close');
-        this.response = res.data;
-        this.door_status = 1;
       } catch (error) {
         console.error(error);
       }
@@ -214,7 +200,7 @@ export default {
   },
   mounted() {
     this.fetchData();
-    setInterval(this.fetchData, 5000);
+    setInterval(this.fetchData, 500);
   }
 };
 </script>
