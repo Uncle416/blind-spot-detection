@@ -133,6 +133,7 @@ export default {
         const res = await axios.post('http://127.0.0.1:5001/api/ultra_sonic_distance', {
           ultra_sonic_distance: this.input_distance
         });
+        this.response = res.data;
       } catch (error) {
         console.error(error);
       }
@@ -142,6 +143,7 @@ export default {
         const res = await axios.post('http://127.0.0.1:5001/api/obstacle_type', {
           obstacle_type: this.input_obstacle_type
         });
+        this.response = res.data;
       } catch (error) {
         console.error(error);
       }
@@ -151,6 +153,7 @@ export default {
         const res = await axios.post('http://127.0.0.1:5001/api/system_status', {
           system_status: this.input_system_status
         });
+        this.response = res.data;
       } catch (error) {
         console.error(error);
       }
@@ -158,6 +161,7 @@ export default {
     async lockCar() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/lock');
+        this.response = res.data;
       } catch (error) {
         console.error(error);
       }
@@ -165,6 +169,7 @@ export default {
     async unlockCar() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/unlock');
+        this.response = res.data;
       } catch (error) {
         console.error(error);
       }
@@ -172,6 +177,7 @@ export default {
     async openDoor() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/open');
+        this.response = res.data;
       } catch (error) {
         console.error(error);
       }
@@ -179,6 +185,7 @@ export default {
     async closeDoor() {
       try {
         const res = await axios.post('http://127.0.0.1:5001/api/close');
+        this.response = res.data;
       } catch (error) {
         console.error(error);
       }
