@@ -102,7 +102,7 @@ def write_status_json():
     global system_status
     while True:
         pdu = 100*system_status + 10*door_status + car_locked
-        ser2.write(pdu)
+        ser2.write(str(pdu).encode('utf-8'))
     #    try:
     #         with lock:
     #             with open(status_file_path, 'w') as f:
@@ -190,7 +190,7 @@ def video_feed_generator(picam2):
             if frame is None:
                 app.logger.warning("Captured frame is None.")
                 continue
-            
+
             # Convert BGR to RGB
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -242,7 +242,7 @@ def lock_car():
     if not car_locked  and door_status == 1:
         car_locked = 2
         pdu = 100*system_status + 10*door_status + car_locked
-        ser2.write(pdu)
+        ser2.write(str(pdu).encode('utf-8'))
         return jsonify({'message': 'Car locked', 'lock_status': car_locked, 'door_status': door_status})
     return jsonify({'message': 'Cannot lock car', 'lock_status': car_locked, 'door_status': door_status}), 403
 
@@ -251,7 +251,7 @@ def unlock_car():
     global car_locked
     car_locked = 1
     pdu = 100*system_status + 10*door_status + car_locked
-    ser2.write(pdu)
+    ser2.write(str(pdu).encode('utf-8'))
     return jsonify({'message': 'Car unlocked', 'lock_status': car_locked, 'door_status': door_status})
 
 @app.route('/api/open', methods=['POST', 'GET'])
@@ -263,11 +263,11 @@ def open_door():
         car_locked = 2
         door_status = 1
         pdu = 100*system_status + 10*door_status + car_locked
-        ser2.write(pdu)
+        ser2.write(str(pdu).encode('utf-8'))
         return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'lock_status': car_locked, 'door_status': door_status}), 403
     door_status = 2
     pdu = 100*system_status + 10*door_status + car_locked
-    ser2.write(pdu)
+    ser2.write(str(pdu).encode('utf-8'))
     return jsonify({'message': 'Car door opened', 'lock_status': car_locked, 'door_status': door_status})
 
 @app.route('/api/close', methods=['POST', 'GET'])
@@ -276,7 +276,7 @@ def close_door():
     if door_status == 2:
         door_status = 1
         pdu = 100*system_status + 10*door_status + car_locked
-        ser2.write(pdu)
+        ser2.write(str(pdu).encode('utf-8'))
         return jsonify({'message': 'Car door closed', 'lock_status': car_locked, 'door_status': door_status})
     return jsonify({'message': 'Door is already closed', 'lock_status': car_locked, 'door_status': door_status})
 
