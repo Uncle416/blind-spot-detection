@@ -64,23 +64,27 @@ def read_distance_serial():
 
 # Function to read and write door status from serial periodically
 def read_write_door_serial():
-    global system_status, car_locked, door_status
+    global system_status, car_locked, door_status, serial_comm_control
     while True:
         try:
             with lock:
-                if ser2.in_waiting > 0:
+                if serial_comm_control == 1 and ser2.in_waiting > 0:
                     line = ser2.readline().decode('utf-8').strip()
                     if line and len(line) >= 3:
                         system_status = int(line[0])
                         door_status = int(line[1])
                         car_locked = int(line[2])
                         print(line)
-                pdu = 100 * system_status + 10 * door_status + car_locked
-                print(pdu)
-                ser2.write(str(pdu).encode('utf-8'))
+                    serial_comm_control = 0
+                elif serial_comm_control == 0:
+                    pdu = 100 * system_status + 10 * door_status + car_locked
+                    print("read write ", pdu)
+                    ser2.write(str(pdu).encode('utf-8'))
+                    serial_comm_control = 1
             time.sleep(1)  # Adjust the interval as needed
         except Exception as e:
             print(f"Error in read_write_door_serial: {e}")
+
         
 # Function to calculate system status
 def calculate_system_status():
@@ -108,8 +112,7 @@ def calculate_system_status():
     return
 
 # YOLOv5 Initialization
-model = YOLOv5("/home/pi/DL-PART/DLP/yolov5s.pt")  # 閫夋嫨妯″瀷
-
+model = YOLOv5("/home/pi/DL-PART/DLP/yolov5s.pt")  # 闁瀚ㄥΟ鈥崇€?
 # Function to handle YOLO model prediction
 def yolo_prediction(picam2):
     global obstacle_type
@@ -124,7 +127,7 @@ def yolo_prediction(picam2):
         detected_objects = []
         for *xyxy, conf, cls in results.xyxy[0]:
             label = f'{model.model.names[int(cls)]} {conf:.2f}'
-            print(f"妫€娴嬪埌鐗╀綋: {label}")
+            print(f"濡偓濞村鍩岄悧鈺€缍? {label}")
             class_label = label.split(' ')[0]
             if class_label.lower() == 'person':
                 detected_objects.append('pedestrian')
@@ -211,12 +214,12 @@ def update_system_status():
 @app.route('/api/lock', methods=['POST', 'GET'])
 def lock_car():
     global car_locked, door_status, serial_comm_control
-    if car_locked == 1 and door_status == 1:
-        car_locked = 2
-
-        serial_comm_control = 1
-        return jsonify({'message': 'Car locked', 'lock_status': car_locked, 'door_status': door_status})
-    return jsonify({'message': 'Cannot lock car', 'lock_status': car_locked, 'door_status': door_status}), 403
+    car_locked = 2
+    
+    serial_comm_control = 1
+    print('LOCK PRESSED')
+    update_serial_status()
+    return jsonify({'message': 'Car locked', 'lock_status': car_locked, 'door_status': door_status})
 
 @app.route('/api/unlock', methods=['POST', 'GET'])
 def unlock_car():
@@ -224,6 +227,8 @@ def unlock_car():
     car_locked = 1
 
     serial_comm_control = 1
+    print('UNLOCK PRESSED')
+    update_serial_status()
     return jsonify({'message': 'Car unlocked', 'lock_status': car_locked, 'door_status': door_status})
 
 @app.route('/api/open', methods=['POST', 'GET'])
@@ -236,10 +241,12 @@ def open_door():
         door_status = 1
 
         serial_comm_control = 1
+        update_serial_status()
         return jsonify({'message': 'Cannot open door due to urgent status. Door locked.', 'lock_status': car_locked, 'door_status': door_status}), 403
     door_status = 2
 
     serial_comm_control = 1
+    update_serial_status()
     return jsonify({'message': 'Car door opened', 'lock_status': car_locked, 'door_status': door_status})
 
 @app.route('/api/close', methods=['POST', 'GET'])
@@ -249,6 +256,7 @@ def close_door():
         door_status = 1
  
         serial_comm_control = 1
+        update_serial_status()
         return jsonify({'message': 'Car door closed', 'lock_status': car_locked, 'door_status': door_status})
     return jsonify({'message': 'Door is already closed', 'lock_status': car_locked, 'door_status': door_status})
 
@@ -263,19 +271,20 @@ def get_current_data():
     })
 
 def update_serial_status():
-    global system_status, car_locked, door_status
+    global system_status, car_locked, door_status, serial_comm_control
     try:
         with lock:
             pdu = 100 * system_status + 10 * door_status + car_locked
-            print(pdu)
+            print("update: ", pdu)
             ser2.write(str(pdu).encode('utf-8'))
+            serial_comm_control = 1
     except Exception as e:
         print(f"Error updating serial status: {e}")
+
     
 if __name__ == '__main__':
     # Start the threads to read JSON files periodically
-    Thread(target=read_distance_json).start()
-    Thread(target=read_write_door_json).start()
+    Thread(target=read_distance_serial).start()
+    Thread(target=read_write_door_serial).start()
 
     app.run(host='0.0.0.0', port=5001, debug=True, threaded=True)
-
