@@ -76,13 +76,18 @@ export default {
       try {
         const res = await axios.get('http://127.0.0.1:5001/api/current_data');
         const data = res.data;
+        // console.log(data);
         this.distance = data.ultra_sonic_distance;
         this.obstacle_type = data.obstacle_type;
         this.system_status = data.system_status;
         this.lock_status = data.lock_status;
         this.door_status = data.door_status;
         this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
-      } catch (error) {
+
+        console.log(this.system_status);
+        console.log(this.door_status);
+        console.log(this.lock_status);
+        } catch (error) {
         console.error(error);
       }
     },
@@ -165,7 +170,7 @@ export default {
     //   }
     // },
     toggleLock() {
-      this.lockCar();
+      this.unlockCar();
     },
     toggleDoor() {
       this.openDoor();

@@ -45,7 +45,7 @@ def read_distance_serial():
     global ultra_sonic_distance
     while True:
         try:
-            with lock:
+#             with lock:
                 if ser1.in_waiting >= 4:
                     data = ser1.read(4)
                     value = struct.unpack('I', data)[0]
@@ -54,7 +54,7 @@ def read_distance_serial():
                         continue
                     ultra_sonic_distance = value / 100
                     ser1.reset_input_buffer()
-            time.sleep(0.5) # Adjust the interval as needed
+                time.sleep(0.5) # Adjust the interval as needed
         except struct.error as e:
             print(f"Error unpacking data: {e}")
             ser1.reset_input_buffer()
@@ -67,24 +67,24 @@ def read_write_door_serial():
     global system_status, car_locked, door_status, serial_comm_control
     while True:
         try:
-            with lock:
-                if ser2.in_waiting > 0:
+            #  with lock:
+                if ser2.in_waiting >= 4:
                     print("read1")
-                    line = ser2.readline().decode('utf-8').strip()
-                    print("read2")
+                    line = ser2.readline().decode('gbk').strip()
+                    print("read2",line)
                     if line and len(line) >= 3:
                         print("read3")
                         system_status = int(line[0])
                         door_status = int(line[1])
                         car_locked = int(line[2])
-                        print(line)
+                        print(system_status,"--",door_status,"--",car_locked)
                     # serial_comm_control = 0
                 # elif serial_comm_control == 0:
                 #     pdu = 100 * system_status + 10 * door_status + car_locked
                 #     print("read write ", pdu)
                 #     ser2.write(str(pdu).encode('utf-8'))
                 #     serial_comm_control = 1
-            time.sleep(1)  # Adjust the interval as needed
+                time.sleep(0.5)  # Adjust the interval as needed
         except Exception as e:
             print(f"Error in read_write_door_serial: {e}")
 
@@ -94,24 +94,32 @@ def calculate_system_status():
     global ultra_sonic_distance, obstacle_type, system_status, car_locked, door_status, serial_comm_control
     if ultra_sonic_distance is None or obstacle_type is None:
         system_status = 1
+        print("ultra_sonic_distance or obstacle_type is None", system_status)
         return
 
     if obstacle_type.lower() == 'pedestrian':
         if 0 <= ultra_sonic_distance < 10:
             system_status = 3
+            print("system_status: ", system_status)
         elif 10 <= ultra_sonic_distance < 30:
             system_status = 2
+            print("system_status: ", system_status)
         else:
             system_status = 1
+            print("system_status: ", system_status)
     elif obstacle_type.lower() == 'car':
         if 0 <= ultra_sonic_distance < 20:
             system_status = 3
+            print("system_status: ", system_status)
         elif 20 <= ultra_sonic_distance < 50:
             system_status = 2
+            print("system_status: ", system_status)
         else:
             system_status = 1
+            print("system_status: ", system_status)
     else:
         system_status = 1
+        print("system_status: ", system_status)
     return
 
 # YOLOv5 Initialization
@@ -130,7 +138,7 @@ def yolo_prediction(picam2):
         detected_objects = []
         for *xyxy, conf, cls in results.xyxy[0]:
             label = f'{model.model.names[int(cls)]} {conf:.2f}'
-            print(f"濡偓濞村鍩岄悧鈺€缍? {label}")
+            print(f"置信度最高项： {label}")
             class_label = label.split(' ')[0]
             if class_label.lower() == 'person':
                 detected_objects.append('pedestrian')
@@ -304,10 +312,10 @@ def get_current_data():
 def update_serial_status():
     global system_status, car_locked, door_status, serial_comm_control
     try:
-        with lock:
+#         with lock:
             pdu = 100 * system_status + 10 * door_status + car_locked
-            print("update: ", pdu)
             ser2.write(str(pdu).encode('utf-8'))
+            print("update_serial_status: ", pdu)
             serial_comm_control = 1
     except Exception as e:
         print(f"Error updating serial status: {e}")
