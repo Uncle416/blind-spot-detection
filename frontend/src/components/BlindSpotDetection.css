@@ -26,13 +26,16 @@ h1 {
     display: flex;
     justify-content: space-between;
     width: 100%;
+    flex-wrap: wrap; /* Ensure it wraps on smaller screens */
     flex: 1; /* Ensure it grows to take available space */
 }
 
 .status-column {
     display: flex;
     flex-direction: column;
-    width: 40%; /* Remaining width after camera feed */
+    width: 100%;
+    max-width: 40%; /* Use max-width to make it responsive */
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
 }
 
 .status-item {
@@ -59,9 +62,11 @@ h1 {
 .camera-feed-section {
     display: flex;
     flex-direction: column;
-    width: 60%; /* Camera feed occupies 60% of the width */
+    width: 100%;
+    max-width: 60%; /* Use max-width to make it responsive */
     text-align: left;
     margin: 10px;
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
 }
 
 .camera-feed label {
@@ -80,6 +85,8 @@ img {
 .control-modules {
     display: flex;
     justify-content: space-between;
+    width: 100%;
+    flex-wrap: wrap; /* Ensure it wraps on smaller screens */
 }
 
 .lock-controls, .door-controls {
@@ -92,9 +99,11 @@ img {
     border-radius: 10px;
     margin-top: 10px;
     text-align: center;
-    width: 48%;
+    width: 100%;
+    max-width: 48%; /* Use max-width to make it responsive */
     position: relative;
     align-items: stretch;
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
 }
 
 .lock-controls p, .door-controls p {
@@ -205,4 +214,12 @@ button[type="submit"]:hover {
     text-align: center;
     width: 100%;
     max-width: 600px;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    .status-column, .camera-feed-section, .lock-controls, .door-controls {
+        width: 100%; /* Make elements full width on small screens */
+        max-width: 100%; /* Ensure max-width is 100% for small screens */
+    }
 }

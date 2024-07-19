@@ -91,10 +91,10 @@ def calculate_system_status():
         return
 
     if obstacle_type.lower() == 'pedestrian':
-        if 0 <= ultra_sonic_distance < 10:
+        if 0 <= ultra_sonic_distance < 20:
             system_status = 3
             print("system_status: ", system_status)
-        elif 10 <= ultra_sonic_distance < 30:
+        elif 20 <= ultra_sonic_distance < 35:
             system_status = 2
             print("system_status: ", system_status)
         else:
@@ -257,7 +257,7 @@ def open_door():
         elif car_locked == 1 and system_status == 3:
             door_status = 2
             update_serial_status()
-            time.sleep(0.2)
+            # time.sleep(0.2)
             door_status = 1
             car_locked = 2
 
