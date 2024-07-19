@@ -65,8 +65,8 @@ export default {
       distance: '',
       obstacle_type: '',
       system_status: '',
-      lock_status: 2, // 1: unlocked, 2: locked
-      door_status: 1, // 1: closed, 2: open
+      lock_status: '', // 1: unlocked, 2: locked
+      door_status: '', // 1: closed, 2: open
       response: null,
       cameraFeedUrl: 'http://127.0.0.1:5001/api/video_feed'
     };
@@ -83,10 +83,12 @@ export default {
         this.lock_status = data.lock_status;
         this.door_status = data.door_status;
         this.cameraFeedUrl = 'http://127.0.0.1:5001/api/video_feed';
+        
 
-        console.log(this.system_status);
-        console.log(this.door_status);
-        console.log(this.lock_status);
+        console.log("fetched");
+        console.log("system stuatus:", this.system_status);
+        console.log("door status:", this.door_status);
+        console.log("lock status:", this.lock_status);
         } catch (error) {
         console.error(error);
       }

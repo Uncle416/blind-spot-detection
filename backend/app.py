@@ -32,14 +32,6 @@ door_status = 1  # 1: closed, 2: open
 # Control variable for serial communication
 serial_comm_control = 1 # 0: write, 1: read
 
-# Define the base directory
-base_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Define the paths for the JSON files
-distance_file_path = os.path.join(base_dir, '..', 'data', 'distance', 'ultra_sonic_distance.json')
-door_file_path = os.path.join(base_dir, '..', 'data', 'door', 'door.json')
-status_file_path = os.path.join(base_dir, '..', 'data', 'status', 'system_status.json')
-
 # Function to read ultra_sonic_distance from serial periodically
 def read_distance_serial():
     global ultra_sonic_distance
@@ -64,7 +56,7 @@ def read_distance_serial():
 
 # Function to read and write door status from serial periodically
 def read_write_door_serial():
-    global system_status, car_locked, door_status, serial_comm_control
+    global system_status, car_locked, door_status
     while True:
         try:
             #  with lock:
@@ -84,17 +76,18 @@ def read_write_door_serial():
                 #     print("read write ", pdu)
                 #     ser2.write(str(pdu).encode('utf-8'))
                 #     serial_comm_control = 1
-                time.sleep(0.5)  # Adjust the interval as needed
+                time.sleep(1)  # Adjust the interval as needed
         except Exception as e:
             print(f"Error in read_write_door_serial: {e}")
 
         
 # Function to calculate system status
 def calculate_system_status():
-    global ultra_sonic_distance, obstacle_type, system_status, car_locked, door_status, serial_comm_control
+    global ultra_sonic_distance, obstacle_type, system_status
     if ultra_sonic_distance is None or obstacle_type is None:
         system_status = 1
         print("ultra_sonic_distance or obstacle_type is None", system_status)
+        update_serial_status()
         return
 
     if obstacle_type.lower() == 'pedestrian':
@@ -120,6 +113,7 @@ def calculate_system_status():
     else:
         system_status = 1
         print("system_status: ", system_status)
+    update_serial_status()
     return
 
 # YOLOv5 Initialization
@@ -234,19 +228,19 @@ def update_system_status():
 
 @app.route('/api/unlock', methods=['POST'])
 def unlock_control():
-    global car_locked, door_status, serial_comm_control
+    global car_locked, serial_comm_control
     if car_locked == 2:
         car_locked = 1
         serial_comm_control = 1
         print('UNLOCK PRESSED')
         update_serial_status()
-        return jsonify({'message': 'Car unlocked', 'lock_status': car_locked, 'door_status': door_status})
+        return jsonify({'message': 'Car unlocked', 'lock_status': car_locked})
     elif car_locked == 1:
         car_locked = 2
         serial_comm_control = 1
         print('LOCK PRESSED')
         update_serial_status()
-        return jsonify({'message': 'Car locked', 'lock_status': car_locked, 'door_status': door_status})
+        return jsonify({'message': 'Car locked', 'lock_status': car_locked})
 
 @app.route('/api/open', methods=['POST'])
 def open_door():
@@ -301,6 +295,7 @@ def open_door():
 
 @app.route('/api/current_data', methods=['GET'])
 def get_current_data():
+    global ultra_sonic_distance, obstacle_type, system_status, car_locked, door_status
     return jsonify({
         'ultra_sonic_distance': ultra_sonic_distance,
         'obstacle_type': obstacle_type,
