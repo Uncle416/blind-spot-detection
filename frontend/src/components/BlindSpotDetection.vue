@@ -34,7 +34,7 @@
           </div>
           <div class="door-controls">
             <p>Open / Close</p>
-            <input type="checkbox" :checked="door_status === 2" id="door" @change="toggleDoor">
+            <input type="checkbox" :checked="door_status === 2" id="door" @change="toggleDoor" :disabled="lock_status === '2'">
             <label for="door" class="toggle-container">
               <div class="action">
                 <span class="option-1">Closed</span>

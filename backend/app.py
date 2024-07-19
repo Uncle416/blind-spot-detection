@@ -244,7 +244,7 @@ def unlock_control():
 
 @app.route('/api/open', methods=['POST'])
 def open_door():
-    global car_locked, door_status, serial_comm_control
+    global car_locked, door_status, system_status, serial_comm_control
     if door_status == 1:
         if car_locked == 2:
             return jsonify({'message': 'Car door cannot be opened as the car is locked'})
@@ -255,6 +255,10 @@ def open_door():
             update_serial_status()
             return jsonify({'message': 'Car door opened', 'lock_status': car_locked, 'door_status': door_status})
         elif car_locked == 1 and system_status == 3:
+            door_status = 2
+            update_serial_status()
+            time.sleep(0.2)
+            door_status = 1
             car_locked = 2
 
             serial_comm_control = 1
